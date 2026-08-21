@@ -1,0 +1,47 @@
+# Dependencies
+node_modules/
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+*.p12
+
+# Runtime databases and persistent application data
+data/
+storage/
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+
+# User uploads (keep the empty directory marker)
+public/uploads/*
+!public/uploads/.gitkeep
+
+# Generated output and temporary files
+output/
+tmp/
+*.pdf
+*.tar.gz
+*.zip
+
+# Logs, caches and test artifacts
+npm-debug.log*
+*.log
+coverage/
+.cache/
+
+# Editors and operating systems
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Accidental local scratch file
+/-

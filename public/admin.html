@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yönetim Paneli | LCV Yönetimi</title>
+  <link rel="stylesheet" href="/css/style.css?v=20260817-8">
+  <script src="/js/qrcode.min.js?v=20260811-1"></script>
+  <script src="/js/html2pdf.bundle.min.js?v=20260811-1"></script>
+</head>
+<body class="theme-warm_ivory">
+  <div class="admin-container">
+    
+    <!-- Admin Header & Action Buttons -->
+    <header class="admin-header-card">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px;">
+        <div>
+          <span class="wedding-subtitle" style="text-align: left; display: block;">Güvenli yönetim paneli</span>
+          <h1 class="wedding-calligraphy" id="eventTitle" style="text-align: left; margin: 0; font-size: 2.4rem;">Yükleniyor...</h1>
+          <p style="color: var(--theme-muted); font-size: 0.88rem; margin-top: 6px;" id="eventMeta">
+            <span id="eventDate">-</span> &bull; <span id="eventLocation">-</span>
+          </p>
+        </div>
+
+        <!-- Uniform Action Buttons -->
+        <div class="admin-nav-tabs">
+          <button class="action-btn-gold" onclick="openSeatingModal()">Salon & Oturma Düzeni</button>
+          <button class="action-btn-gold" onclick="openCustomizeModal()">Tasarım Düzenleyici</button>
+          <button class="action-btn-gold" onclick="openEditModal()">Etkinlik Bilgileri</button>
+          <button class="btn-secondary" onclick="logoutAdmin()">Güvenli çıkış</button>
+        </div>
+      </div>
+
+      <!-- Quick Link Sharing Row -->
+      <div class="admin-share-row">
+        <label class="form-label" style="font-size: 0.78rem;">Davetli Bağlantısı (Public Link):</label>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+          <div class="link-box" style="flex: 1; min-width: 260px;">
+            <input type="text" id="publicUrlInput" class="link-input" readonly>
+            <button class="btn-secondary" onclick="copyInput('publicUrlInput')">Kopyala</button>
+          </div>
+          <a id="previewPublicBtn" href="#" target="_blank" class="btn-secondary" style="text-decoration: none;">
+            Davetli Sayfasını Aç
+          </a>
+          <button class="btn-secondary" onclick="shareWhatsApp()">WhatsApp</button>
+          <button class="btn-secondary" onclick="showQrModal()">QR Kodu</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Summary Metrics Row -->
+    <div class="admin-stats-grid">
+      <div class="stat-card">
+        <div class="stat-info">
+          <div class="stat-value" id="statTotalPeople">0</div>
+          <div class="stat-label">Toplam Gelecek Kişi</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-info">
+          <div class="stat-value" id="statAttendingMain" style="color: var(--attending-color);">0</div>
+          <div class="stat-label">Katılan Konuklar</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-info">
+          <div class="stat-value" id="statDeclinedMain" style="color: var(--declined-color);">0</div>
+          <div class="stat-label">Katılmayan Konuklar</div>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-info">
+          <div class="stat-value" id="statPlusOnes">0</div>
+          <div class="stat-label">Gelecek Misafirler (+1)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter & Guest Table -->
+    <div class="admin-table-card">
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+        <h2 style="font-family: var(--font-ui); font-size: 1.35rem; color: var(--theme-text); font-weight: 500;">
+          Davetli Listesi (<span id="responseCountText">0</span>)
+        </h2>
+
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; flex: 1; max-width: 650px; justify-content: flex-end; align-items: center;">
+          <input type="text" id="searchInput" class="form-input" placeholder="İsim, yemek veya not ara..." style="max-width: 200px; padding: 8px 12px;" oninput="filterResponses()">
+          <select id="filterStatus" class="form-select" style="max-width: 150px; padding: 8px 12px;" onchange="filterResponses()">
+            <option value="ALL">Tüm Katılımlar</option>
+            <option value="ATTENDING">Katılanlar</option>
+            <option value="DECLINED">Katılmayanlar</option>
+          </select>
+          <button class="btn-secondary" onclick="exportCSV()" style="padding: 8px 14px; font-size: 0.85rem;">CSV İndir</button>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Davetli Adı Soyadı</th>
+              <th>Katılım Durumu</th>
+              <th>Yanındakiler (+1)</th>
+              <th>Yemek Tercihi</th>
+              <th>Şarkı İsteği & Not</th>
+              <th>Güncelleme</th>
+              <th style="text-align: right;">İşlem</th>
+            </tr>
+          </thead>
+          <tbody id="responsesTableBody">
+            <tr>
+              <td colspan="7" style="text-align: center; color: var(--theme-muted); padding: 36px;">
+                Henüz yanıt alınmadı. Davetli bağlantısını paylaşarak LCV toplamaya başlayabilirsiniz.
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR Modal -->
+  <div class="modal-overlay" id="qrModal">
+    <div class="modal-content" style="text-align: center;">
+      <h3 style="color: var(--theme-text); margin-bottom: 16px; font-family: var(--font-ui); font-size: 1.4rem;">Davet Linki QR Kodu</h3>
+      <div id="qrcodeContainer" style="display: flex; justify-content: center; margin-bottom: 24px;"></div>
+      <button class="btn-secondary" onclick="closeQrModal()" style="width: 100%; justify-content: center;">Kapat</button>
+    </div>
+  </div>
+
+  <!-- Edit Basic Event Info Modal -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="color: var(--theme-text); font-family: var(--font-ui); font-size: 1.4rem;">Etkinlik Bilgilerini Düzenle</h3>
+        <button class="btn-secondary" onclick="closeEditModal()" style="padding: 4px 10px;">✕</button>
+      </div>
+      <form id="editEventForm">
+        <div class="form-group">
+          <label class="form-label">Etkinlik Başlığı</label>
+          <input type="text" id="editTitle" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Çift İsimleri (Gelin & Damat)</label>
+          <input type="text" id="editCoupleNames" class="form-input" placeholder="Örn: Ahmet & Ayşe">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Tarih ve Saat</label>
+          <input type="datetime-local" id="editDate" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Mekan ve Adres</label>
+          <input type="text" id="editLocation" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Google Maps Bağlantısı (URL)</label>
+          <input type="text" id="editMapUrl" class="form-input" placeholder="https://maps.app.goo.gl/...">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Özel Ağ Adresi / Domain (Mobil Bağlantı)</label>
+          <input type="text" id="editBaseUrl" class="form-input" placeholder="Örn: http://192.168.1.35:3000 veya https://dugunumuz.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Genel Not / Açıklama</label>
+          <textarea id="editDescription" class="form-textarea"></textarea>
+        </div>
+        <div style="display: flex; gap: 12px; margin-top: 24px;">
+          <button type="button" class="btn-secondary" onclick="closeEditModal()" style="flex: 1; justify-content: center;">İptal</button>
+          <button type="submit" class="btn-primary" style="flex: 1;">Kaydet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Customize Wedding Page & Visual Styling Modal -->
+  <div class="modal-overlay" id="customizeModal">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h3 style="color: var(--theme-text); font-family: var(--font-ui); font-size: 1.4rem;">Tasarım & Renk Düzenleyici</h3>
+        <button class="btn-secondary" onclick="closeCustomizeModal()" style="padding: 4px 10px;">✕</button>
+      </div>
+
+      <form id="customizeForm">
+        <div class="form-group">
+          <label class="form-label">Tema Şablonu (Renk Paleti)</label>
+          <select id="editTheme" class="form-select" onchange="onThemePresetChange(this.value)">
+            <option value="warm_ivory">Şampanya & Fildişi — Klasik</option>
+            <option value="botanical_sage">Zümrüt Yeşili & Botanik</option>
+            <option value="blush_rose">Gül Pembesi & Kadife</option>
+            <option value="noir_gold">Gece Siyahı & Altın</option>
+            <option value="sage_linen">Adaçayı & Keten</option>
+            <option value="burgundy_cream">Bordo & Krem</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Çift İsimleri Yazı Tipi (3. Kısım)</label>
+          <select id="editFontFamily" class="form-select font-preview-select" onchange="applyFontSelectPreview(this)">
+            <option value="Alex Brush">Alex Brush — El Yazısı</option>
+            <option value="Corinthia">Corinthia — İnce ve Zarif</option>
+            <option value="Italianno">Italianno — Akıcı Kaligrafi</option>
+            <option value="Parisienne">Parisienne — Paris Esintili</option>
+            <option value="Great Vibes">Great Vibes — Gösterişli Kaligrafi</option>
+            <option value="Cormorant Garamond">Cormorant Garamond — Zarif Klasik</option>
+            <option value="Bodoni Moda">Bodoni Moda — Moda Editoryali</option>
+            <option value="Playfair Display">Playfair Display — Romantik Serif</option>
+            <option value="Cinzel">Cinzel — Tören ve Monogram</option>
+            <option value="Prata">Prata — Lüks Davetiye</option>
+          </select>
+          <small style="color: var(--theme-muted); display: block; margin-top: 5px; font-size: 0.78rem;">
+            Bu seçim sadece 3. kısımdaki çift isimlerinin yazı tipini değiştirir.
+          </small>
+        </div>
+
+        <!-- Monogram Crest Style & Separate Font Options -->
+        <div class="form-group" style="background: var(--theme-surface-muted); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--theme-border);">
+          <label class="form-label" style="margin-bottom: 10px;">Monogram Amblem Ayarları (1. Kısım):</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+            <div>
+              <label style="font-size: 0.75rem; display: block; margin-bottom: 4px;">Amblem Şekli</label>
+              <select id="editCrestStyle" class="form-select" style="padding: 8px;">
+                <option value="circle">Daire Çerçeve</option>
+                <option value="diamond">Baklava Çerçeve</option>
+                <option value="square">Yumuşak Kare Çerçeve</option>
+                <option value="minimal">Çerçevesiz Sade Metin</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 0.75rem; display: block; margin-bottom: 4px;">Amblem Metni</label>
+              <input type="text" id="editCrestText" class="form-input" placeholder="Örn: E&E veya E+E" style="padding: 8px;">
+            </div>
+          </div>
+          <div style="margin-top: 8px;">
+            <label style="font-size: 0.75rem; display: block; margin-bottom: 4px;">Amblem Yazı Tipi (1. Kısım Fontu)</label>
+            <select id="editCrestFont" class="form-select font-preview-select" style="padding: 8px;" onchange="applyFontSelectPreview(this)">
+              <option value="Alex Brush">Alex Brush — El Yazısı</option>
+              <option value="Corinthia">Corinthia — İnce ve Zarif</option>
+              <option value="Italianno">Italianno — Akıcı Kaligrafi</option>
+              <option value="Parisienne">Parisienne — Paris Esintili</option>
+              <option value="Great Vibes">Great Vibes — Gösterişli Kaligrafi</option>
+              <option value="Cormorant Garamond">Cormorant Garamond — Zarif Klasik</option>
+              <option value="Bodoni Moda">Bodoni Moda — Moda Editoryali</option>
+              <option value="Playfair Display">Playfair Display — Romantik Serif</option>
+              <option value="Cinzel">Cinzel — Tören ve Monogram</option>
+              <option value="Prata">Prata — Lüks Davetiye</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" style="margin-bottom: 10px;">Renk Ayarları (Özel Renkler):</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+            <div>
+              <label style="font-size: 0.75rem; display: block; margin-bottom: 4px;">Vurgu Rengi</label>
+              <input type="color" id="editAccentColor" class="form-input" style="height: 38px; padding: 2px; cursor: pointer;" value="#b78c4a">
+            </div>
+            <div>
+              <label style="font-size: 0.75rem; display: block; margin-bottom: 4px;">Arkaplan</label>
+              <input type="color" id="editBgColor" class="form-input" style="height: 38px; padding: 2px; cursor: pointer;" value="#faf8f4">
+            </div>
+            <div>
+              <label style="font-size: 0.75rem; display: block; margin-bottom: 4px;">Metin Rengi</label>
+              <input type="color" id="editTextColor" class="form-input" style="height: 38px; padding: 2px; cursor: pointer;" value="#2b2925">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Yemek Seçenekleri (Virgülle Ayırın)</label>
+          <input type="text" id="editMealOptions" class="form-input" placeholder="Örn: Kırmızı Et Menüsü, Tavuk Menüsü, Vejetaryen, Çocuk Menüsü">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Davetiye Görseli Yükle</label>
+          <input type="file" id="invitationFileInput" class="form-input" accept="image/*" style="padding: 8px;">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">veya Görsel Bağlantısı / Yüklü Görsel Yolu</label>
+          <input type="text" id="editInvitationUrl" class="form-input" placeholder="https://ornek.com/davetiye.jpg veya /uploads/gorsel.jpg">
+        </div>
+
+        <div id="imagePreviewContainer" style="display: none; margin-bottom: 18px; text-align: center; background: var(--theme-surface-muted); padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--theme-border);">
+          <label style="font-size: 0.78rem; font-weight: 600; color: var(--theme-muted); display: block; margin-bottom: 6px;">Mevcut Davetiye Görseli Önizleme:</label>
+          <img id="imagePreview" src="" alt="Davetiye Görseli" style="max-width: 100%; max-height: 180px; border-radius: 4px; border: 1px solid var(--theme-border); object-fit: contain;">
+          <div style="margin-top: 8px;">
+            <button type="button" class="btn-secondary" onclick="clearInvitationImage()" style="padding: 4px 10px; font-size: 0.75rem; color: #ef4444; border-color: rgba(239,68,68,0.3);">
+              🗑️ Görseli Kaldır
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Davetiye Hoş Geldiniz Mesajı (5. Kısım)</label>
+          <textarea id="editWelcomeMessage" class="form-textarea" placeholder="Bu mutlu günümüzde sizleri de aramızda görmekten onur duyarız..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Giyim Kodu (Dress Code)</label>
+          <input type="text" id="editDressCode" class="form-input" placeholder="Örn: Black Tie / Şık Giyim">
+        </div>
+
+        <div class="form-group" style="padding: 12px 0;">
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; cursor: pointer; margin-bottom: 8px;">
+            <input type="checkbox" id="editEnableMeal" checked> Yemek Tercihi Sorusunu Göster
+          </label>
+          <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; cursor: pointer;">
+            <input type="checkbox" id="editEnableSong" checked> Şarkı İsteği Kutusu Göster
+          </label>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Düğün Programı & Akışı</label>
+          <div id="scheduleListContainer" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px;"></div>
+          <button type="button" class="btn-secondary" onclick="addScheduleRow()" style="width: 100%; justify-content: center; font-size: 0.82rem;">
+            Yeni Program Maddesi Ekle
+          </button>
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-top: 24px;">
+          <button type="button" class="btn-secondary" onclick="closeCustomizeModal()" style="flex: 1; justify-content: center;">İptal</button>
+          <button type="submit" class="btn-primary" style="flex: 1;" id="btnSaveCustomization">Tasarımı Kaydet</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Interactive Drag-and-Drop, Configurable Hall Size & PDF Modal -->
+  <div class="modal-overlay" id="seatingModal">
+    <div class="modal-content seating-workspace-modal" style="max-width: 1300px; width: 100%;">
+      <div class="seating-workspace-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px;">
+        <div class="seating-workspace-heading">
+          <span class="seating-eyebrow">DAVETLİ YERLEŞİMİ</span>
+          <h3 style="color: var(--theme-text); font-family: var(--font-ui); font-size: 1.4rem;">
+            Oturma Düzeni
+          </h3>
+          <p style="color: var(--theme-muted); font-size: 0.82rem;">
+            Konukları masalara yerleştirin, salon planını düzenleyin ve görevli listesini hazırlayın.
+          </p>
+        </div>
+        
+        <div class="seating-header-actions" style="display: flex; gap: 10px; align-items: center;">
+          <button type="button" class="btn-secondary seating-action seating-action-primary" onclick="exportSeatingGuestListPDF()" style="padding: 6px 14px; font-size: 0.82rem; color: var(--theme-primary); border-color: var(--theme-primary);">
+            ↓ Görevli Listesi PDF
+          </button>
+          <button type="button" class="btn-secondary" onclick="exportSeatingPDF()" style="padding: 6px 14px; font-size: 0.82rem;">
+            Salon Planı PDF
+          </button>
+          <button type="button" class="btn-secondary" id="btnToggleSeatingView" onclick="toggleSeatingViewMode()" style="padding: 6px 14px; font-size: 0.82rem;">
+            Salon planına geç
+          </button>
+          <button class="btn-secondary seating-close-button" onclick="closeSeatingModal()" style="padding: 4px 10px;" aria-label="Oturma düzenini kapat">✕</button>
+        </div>
+      </div>
+
+      <div class="seating-summary" aria-label="Oturma düzeni özeti">
+        <div class="seating-summary-item"><span>Toplam konuk</span><strong id="seatingTotalGuests">0</strong></div>
+        <div class="seating-summary-item"><span>Yerleştirilen</span><strong id="seatingAssignedGuests">0</strong></div>
+        <div class="seating-summary-item is-pending"><span>Bekleyen</span><strong id="seatingOpenGuests">0</strong></div>
+        <div class="seating-summary-item"><span>Toplam kapasite</span><strong id="seatingTotalCapacity">0</strong></div>
+      </div>
+
+      <!-- Add New Table, Hall Size Configurator & Architectural Elements Bar -->
+      <div class="seating-toolbar" style="margin-bottom: 16px; padding-bottom: 14px; border-bottom: 1px solid var(--theme-border);">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+          
+          <!-- Table Creator -->
+          <div class="table-create-group" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+            <input type="text" id="newTableName" class="form-input" placeholder="Masa Adı (Örn: Masa 1)" style="width: 150px; padding: 6px 12px; height: 36px;">
+            <input type="number" id="newTableCapacity" class="form-input" value="10" min="1" max="50" style="width: 80px; padding: 6px 10px; height: 36px;" placeholder="Kapasite">
+            <button type="button" class="btn-primary seating-add-table" onclick="createNewTable()" style="padding: 0 14px; font-size: 0.82rem; height: 36px;">+ Masa Ekle</button>
+          </div>
+
+          <!-- Configurable Hall Dimensions (Önceden Tanımlı Veya Özel Ölçü) -->
+          <div id="hallSizeControls" style="display: none; align-items: center; gap: 6px; background: var(--theme-surface-muted); padding: 4px 10px; border-radius: var(--radius-md); border: 1px solid var(--theme-border);">
+            <span style="font-size: 0.78rem; font-weight: 600; color: var(--theme-text);">Salon Ölçüsü:</span>
+            <input type="number" id="hallWidthMeters" value="10" min="5" max="100" style="width: 50px; padding: 4px; height: 30px; font-size: 0.8rem; text-align: center;" class="form-input">
+            <span style="font-size: 0.78rem;">x</span>
+            <input type="number" id="hallHeightMeters" value="10" min="5" max="100" style="width: 50px; padding: 4px; height: 30px; font-size: 0.8rem; text-align: center;" class="form-input">
+            <span style="font-size: 0.78rem; font-weight: 500;">Metre</span>
+
+            <button type="button" class="btn-secondary" onclick="setHallPreset(10, 10)" style="padding: 2px 6px; height: 28px; font-size: 0.72rem;">10x10m Kare</button>
+            <button type="button" class="btn-secondary" onclick="setHallPreset(15, 10)" style="padding: 2px 6px; height: 28px; font-size: 0.72rem;">15x10m</button>
+            <button type="button" class="btn-secondary" onclick="setHallPreset(20, 15)" style="padding: 2px 6px; height: 28px; font-size: 0.72rem;">20x15m</button>
+            <button type="button" class="btn-primary" onclick="applyCustomHallSize()" style="padding: 2px 10px; height: 28px; font-size: 0.75rem;">Uygula</button>
+          </div>
+
+          <!-- Architectural Hall Elements Toolbar -->
+          <div id="architecturalToolbar" style="display: none; gap: 6px; flex-wrap: wrap; align-items: center;">
+            <button type="button" class="btn-secondary" onclick="addDecoration('STAGE', 'Sahne & Dans Alanı', 220, 100)" style="padding: 4px 8px; font-size: 0.75rem; height: 32px;">+ Sahne</button>
+            <button type="button" class="btn-secondary" onclick="addDecoration('COUPLE_TABLE', 'Gelin & Damat Masası', 160, 75)" style="padding: 4px 8px; font-size: 0.75rem; height: 32px;">+ Gelin Damat Masası</button>
+            <button type="button" class="btn-secondary" onclick="addDecoration('ENTRANCE', 'Giriş / Kapı', 110, 45)" style="padding: 4px 8px; font-size: 0.75rem; height: 32px;">+ Giriş Kapısı</button>
+            <button type="button" class="btn-secondary" onclick="addDecoration('KITCHEN', 'Mutfak / Servis', 130, 65)" style="padding: 4px 8px; font-size: 0.75rem; height: 32px;">+ Mutfak</button>
+            <button type="button" class="btn-secondary" onclick="addDecoration('DJ_BOOTH', 'DJ & Müzik Kabini', 120, 55)" style="padding: 4px 8px; font-size: 0.75rem; height: 32px;">+ DJ / Müzik</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Drag & Drop Layout Container -->
+      <div class="seating-grid-layout" style="display: grid; grid-template-columns: 280px 1fr; gap: 18px; min-height: 520px;">
+        
+        <!-- Left Sidebar: Unassigned Guest Cards -->
+        <div class="unassigned-panel" style="background: var(--theme-surface-muted); border-radius: var(--radius-md); padding: 14px; display: flex; flex-direction: column;">
+          <div class="unassigned-panel-header" style="font-weight: 600; font-size: 0.85rem; color: var(--theme-text); margin-bottom: 12px; display: flex; justify-content: space-between;">
+            <span><small class="panel-kicker">YERLEŞTİRİLECEKLER</small>Bekleyen Konuklar</span><span class="guest-count-badge" id="unassignedCount">0</span>
+          </div>
+          <label class="guest-search"><span aria-hidden="true">⌕</span><input id="guestSearchInput" type="search" placeholder="Konuk ara…" oninput="renderSeatingTables()" autocomplete="off"></label>
+          <p class="unassigned-help">Sürükleyin veya dokunup ardından bir masa seçin.</p>
+          <div id="unassignedGuestsSidebar" class="unassigned-guest-list" style="flex: 1; overflow-y: auto; max-height: 480px; padding-right: 4px;">
+            <div style="text-align: center; color: var(--theme-muted); padding: 20px;">Yükleniyor...</div>
+          </div>
+        </div>
+
+        <!-- Right Side: Main Area -->
+        <div id="seatingMainArea" class="seating-main-area" style="position: relative; display: flex; flex-direction: column;">
+          <div class="seating-main-heading"><div><small class="panel-kicker">MASALAR</small><h4>Masa yerleşimi</h4></div><span id="seatingSelectionHint">Bir konuğu masaya sürükleyin</span></div>
+          
+          <!-- 1. Grid/Cards View -->
+          <div id="seatingTablesGrid" class="seating-tables-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; max-height: 520px; overflow-y: auto;">
+            <div style="text-align: center; color: var(--theme-muted); padding: 20px; grid-column: 1/-1;">Masalar yükleniyor...</div>
+          </div>
+
+          <!-- 2. Visual Salon Floor Plan View Container (Defined Hall Boundaries & Aspect Ratio Exact PDF Export) -->
+          <div id="salonFloorCanvasContainer" class="salon-floor-container" style="display: none; width: 100%; height: 520px; position: relative; border: 1px solid var(--theme-border); border-radius: var(--radius-md); overflow: hidden; background: #f2ede4;">
+            
+            <!-- Zoom Controls Bar -->
+            <div class="zoom-controls-bar" style="position: absolute; top: 12px; right: 12px; z-index: 100; background: var(--theme-surface); border: 1px solid var(--theme-border); border-radius: var(--radius-md); padding: 4px 8px; display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow-card);">
+              <span style="font-size: 0.75rem; color: var(--theme-muted); font-weight: 500;">Ölçek:</span>
+              <button type="button" class="btn-secondary" onclick="zoomCanvas(-0.1)" style="padding: 2px 8px; height: 26px; font-size: 0.85rem; font-weight: 600;">-</button>
+              <span id="zoomLevelDisplay" style="font-size: 0.78rem; font-weight: 600; min-width: 42px; text-align: center;">100%</span>
+              <button type="button" class="btn-secondary" onclick="zoomCanvas(0.1)" style="padding: 2px 8px; height: 26px; font-size: 0.85rem; font-weight: 600;">+</button>
+              <button type="button" class="btn-ghost" onclick="resetCanvasTransform()" style="padding: 2px 6px; height: 26px; font-size: 0.75rem;">Sığdır</button>
+              <button type="button" class="btn-secondary seating-focus-button" id="btnSeatingFocusMode" onclick="toggleSeatingFocusMode()" aria-pressed="false">⛶ Genişlet</button>
+            </div>
+
+            <!-- Canvas Pan Viewport -->
+            <div id="salonFloorCanvasViewport">
+              
+              <!-- Defined Architectural Hall Canvas Frame (With Outer Wall Border & Dimension Title) -->
+              <div id="salonFloorCanvas" style="position: absolute; transition: transform 0.05s ease-out;">
+                
+                <!-- Hall Boundary Header Banner -->
+                <div id="hallHeaderBanner" style="position: absolute; top: -32px; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; font-size: 0.78rem; font-weight: 600; color: var(--theme-primary);">
+                  <span id="hallTitleBannerText">DÜĞÜN SALONU DÜZENİ</span>
+                  <span id="hallDimensionsTag" style="background: var(--theme-surface); padding: 2px 8px; border-radius: 4px; border: 1px solid var(--theme-border);">10m x 10m (1:1 Kare)</span>
+                </div>
+
+                <div id="salonTablesLayer" style="width: 100%; height: 100%; position: relative;"></div>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div style="margin-top: 16px; text-align: right;">
+        <button type="button" class="btn-secondary" onclick="closeSeatingModal()">Kapat</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast">İşlem başarılı!</div>
+
+  <script src="/js/admin.js?v=20260817-7"></script>
+</body>
+</html>

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Etkinlik Oluştur | Self-Hosted LCV Sistemi</title>
+  <link rel="stylesheet" href="/css/style.css?v=20260811-7">
+  <script src="/js/qrcode.min.js?v=20260811-1"></script>
+</head>
+<body>
+  <div class="container page-shell">
+    <nav class="page-nav" aria-label="Ana navigasyon">
+      <a class="brand-mark" href="/">Davet</a>
+      <a class="btn-secondary nav-login" href="/login">Yönetici girişi</a>
+    </nav>
+    <div class="glass-card hero-card">
+      <div class="header-ornament">
+        <span class="eyebrow">Self-Hosted LCV Panel</span>
+        <h1 class="event-title">Yeni Etkinlik Oluştur</h1>
+        <p class="lead-copy">
+          Davetlileriniz için kolay erişilen bir katılım formu oluşturun; yanıtları parola korumalı yönetim panelinden takip edin.
+        </p>
+      </div>
+
+      <form id="createEventForm">
+        <div class="form-group">
+          <label class="form-label" for="title">Etkinlik Başlığı *</label>
+          <input type="text" id="title" class="form-input" placeholder="Örn: Ahmet & Ayşe Düğünü" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="admin_password">Yönetici Parolası *</label>
+          <input type="password" id="admin_password" class="form-input" minlength="12" maxlength="128" autocomplete="new-password" required>
+          <small style="color: var(--text-muted);">En az 12 karakter; en az bir harf ve bir rakam kullanın.</small>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="setup_key">Sunucu Kurulum Anahtarı *</label>
+          <input type="password" id="setup_key" class="form-input" autocomplete="off" required>
+          <small style="color: var(--text-muted);">Sunucunun <code>SETUP_KEY</code> ortam değişkeninde belirlenen anahtar.</small>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="event_date">Tarih ve Saat *</label>
+          <input type="datetime-local" id="event_date" class="form-input" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="location">Mekan / Adres Bilgisi *</label>
+          <input type="text" id="location" class="form-input" placeholder="Örn: Çırağan Sarayı, Beşiktaş / İstanbul" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="description">Açıklama / Ev Sahibi Notu (İsteğe Bağlı)</label>
+          <textarea id="description" class="form-textarea" placeholder="Davetlilerinize iletmek istediğiniz özel not, giyim kodu veya karşılama bilgisi..."></textarea>
+        </div>
+
+        <p id="createEventError" class="form-error" role="alert" aria-live="polite" tabindex="-1"></p>
+        <div class="form-actions">
+          <button type="submit" class="btn-primary" id="btnSubmit">
+            Etkinliği oluştur
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Result Box for Generated Links -->
+    <div class="glass-card" id="resultCard" style="display: none;">
+      <div class="header-ornament" style="margin-bottom: 18px;">
+        <span class="eyebrow" style="color: var(--attending-color);">Etkinlik Oluşturuldu</span>
+        <h2 style="font-family: var(--font-serif); font-size: 1.6rem; color: var(--text-main);">Erişim Bağlantılarınız</h2>
+      </div>
+
+      <!-- Public Guest Link -->
+      <div class="form-group">
+        <label class="form-label" style="color: var(--text-main);">
+          Davetli Bağlantısı (WhatsApp / SMS ile Paylaşın):
+        </label>
+        <div class="link-box">
+          <input type="text" id="publicUrlInput" class="link-input" readonly>
+          <button class="btn-secondary" onclick="copyInput('publicUrlInput')">Kopyala</button>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 12px; margin-top: 28px; flex-wrap: wrap;">
+        <a id="goToAdminBtn" href="#" class="btn-primary">
+          Yönetim Paneline Git
+        </a>
+        <button class="btn-secondary" onclick="showQrModal()">
+          QR Kod
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR Modal -->
+  <div class="modal-overlay" id="qrModal">
+    <div class="modal-content">
+      <h3 style="color: var(--text-main); margin-bottom: 12px; font-family: var(--font-serif); font-size: 1.4rem;">Davetli Bağlantısı QR Kodu</h3>
+      <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">Davetiyelerin üzerine basmak veya ekranda göstermek için taratılabilir QR kod:</p>
+      <div id="qrcodeContainer" style="display: flex; justify-content: center; margin-bottom: 20px;"></div>
+      <button class="btn-secondary" onclick="closeQrModal()" style="width: 100%;">Kapat</button>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast">Metin kopyalandı.</div>
+
+  <script src="/js/admin.js?v=20260811-4"></script>
+</body>
+</html>

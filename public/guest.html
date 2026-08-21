@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Düğün Davetiyesi & LCV Formu</title>
+  <link rel="stylesheet" href="/css/style.css?v=20260811-7">
+</head>
+<body class="theme-warm_ivory">
+  <div class="container">
+    
+    <!-- Hero & Main Invitation Header -->
+    <header class="invitation-header">
+      <!-- Monogram Crest Emblem (Configurable Style & Enlarged) -->
+      <div class="crest-header">
+        <div class="crest-monogram circle" id="crestMonogram">E&E</div>
+        <div class="wedding-subtitle">Düğün Davetiyesi</div>
+      </div>
+
+      <!-- Couple Names in Calligraphy -->
+      <h1 class="wedding-calligraphy" id="eventCalligraphyTitle">Ahmet & Ayşe</h1>
+      <div class="event-title-subtitle" id="eventSubtitle">Evleniyor</div>
+
+      <!-- Welcome Message / Poem (Centered) -->
+      <div class="welcome-quote" id="welcomeMessageText" style="display: none; text-align: center; margin: 16px auto 24px;"></div>
+
+      <!-- Reverted 4-Card Grid Countdown Timer (User Preference) -->
+      <div class="countdown-box" id="countdownBox">
+        <div class="countdown-card">
+          <div class="countdown-number" id="cdDays">00</div>
+          <div class="countdown-label">Gün</div>
+        </div>
+        <div class="countdown-card">
+          <div class="countdown-number" id="cdHours">00</div>
+          <div class="countdown-label">Saat</div>
+        </div>
+        <div class="countdown-card">
+          <div class="countdown-number" id="cdMins">00</div>
+          <div class="countdown-label">Dakika</div>
+        </div>
+        <div class="countdown-card">
+          <div class="countdown-number" id="cdSecs">00</div>
+          <div class="countdown-label">Saniye</div>
+        </div>
+      </div>
+
+      <!-- Primary Event Info (Date & Location) -->
+      <div class="hero-event-info">
+        <div class="hero-info-row">
+          <svg class="hero-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          <div>
+            <strong id="eventDateStr">Yükleniyor...</strong>
+            <span id="eventTimeStr" class="hero-subtext">Tarih ve saat</span>
+          </div>
+        </div>
+
+        <div class="hero-info-row">
+          <svg class="hero-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+          <div>
+            <strong id="eventLocation">Yükleniyor...</strong>
+            <a id="mapLink" href="#" target="_blank" class="map-btn">
+              Haritada Göster & Yol Tarifi
+            </a>
+          </div>
+        </div>
+
+        <div class="hero-info-row" id="dressCodeContainer" style="display: none;">
+          <svg class="hero-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.47a1 1 0 00.99.84H6v10a2 2 0 002 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.47a2 2 0 00-1.34-2.23z"></path></svg>
+          <div>
+            <strong>Giyim Kodu:</strong>
+            <span id="dressCodeBadge" class="hero-subtext"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Invitation Cover Photo -->
+      <button type="button" class="invitation-image-card" id="invitationImageFrame" style="display: none;" onclick="openImageModal()" aria-label="Davetiye görselini büyüt">
+        <img id="invitationImg" src="" alt="Düğün Davetiye Görseli">
+        <div class="image-overlay-hint">Tam Boyut Gör</div>
+      </button>
+
+      <!-- Timeline & Schedule Section -->
+      <div class="timeline-section" id="timelineSection" style="display: none;">
+        <h3 class="section-heading">Düğün Programı</h3>
+        <div class="timeline-list" id="timelineContainer"></div>
+      </div>
+
+      <div class="detail-item" id="descriptionContainer" style="display: none; margin-top: 24px;">
+        <div class="detail-text">
+          <strong>Ev Sahibinden Not:</strong>
+          <span id="eventDescription" style="white-space: pre-wrap;"></span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Prominent RSVP Form -->
+    <main class="rsvp-card" id="rsvpFormCard">
+      <div class="info-banner" id="updateBanner" style="display: none;">
+        <div>
+          <strong>Yanıtınızı güncelliyorsunuz</strong>
+          <div style="font-size: 0.78rem; opacity: 0.85;">Cihazınız tanındı, önceki yanıtınız forma yüklendi.</div>
+        </div>
+      </div>
+
+      <form id="rsvpForm">
+        <div class="rsvp-form-header">
+          <h2 class="rsvp-title">Katılım Bildirimi (RSVP)</h2>
+          <p class="rsvp-subtitle">Lütfen katılım durumunuzu aşağıdaki formu doldurarak iletiniz.</p>
+        </div>
+
+        <!-- Guest Name -->
+        <div class="form-group">
+          <label class="form-label" for="guest_name">Adınız ve Soyadınız *</label>
+          <input type="text" id="guest_name" class="form-input" placeholder="Örn: Ahmet Yılmaz" required>
+        </div>
+
+        <!-- Attendance Status -->
+        <div class="form-group">
+          <label class="form-label">Katılım Durumunuz *</label>
+          <div class="status-grid">
+            <button type="button" class="status-btn attending" id="btnAttending" onclick="selectStatus('ATTENDING')" aria-pressed="false">
+              <span>Katılıyorum</span>
+            </button>
+            <button type="button" class="status-btn declined" id="btnDeclined" onclick="selectStatus('DECLINED')" aria-pressed="false">
+              <span>Katılamıyorum</span>
+            </button>
+          </div>
+          <input type="hidden" id="status" required>
+        </div>
+
+        <!-- Meal Selection Section -->
+        <div class="form-group" id="mealSection" style="display: none;">
+          <label class="form-label">Yemek Tercihiniz</label>
+          <div class="meal-grid" id="mealPillsContainer"></div>
+          <input type="hidden" id="meal_choice">
+        </div>
+
+        <!-- Plus Ones Section -->
+        <div class="plus-ones-card" id="plusOnesSection">
+          <label class="form-label">Yanınızda biri gelecek mi?</label>
+          <div class="toggle-group">
+            <button type="button" class="toggle-btn" id="toggleNo" onclick="setPlusOnesToggle(false)" aria-pressed="false">Yalnız geleceğim</button>
+            <button type="button" class="toggle-btn" id="toggleYes" onclick="setPlusOnesToggle(true)" aria-pressed="false">Yanımda misafirim var</button>
+          </div>
+
+          <div id="plusOnesInputs" style="display: none; margin-top: 14px;">
+            <div class="form-group">
+              <label class="form-label" for="plus_ones_count">Yanınızda Kaç Kişi Gelecek?</label>
+              <input type="number" id="plus_ones_count" class="form-input" min="1" max="10" value="1" onchange="updatePlusOnesCards()" onkeyup="updatePlusOnesCards()">
+            </div>
+
+            <!-- Dynamic Cards per +1 Guest -->
+            <div id="plusOnesCardsContainer"></div>
+          </div>
+        </div>
+
+        <!-- Song Request Section -->
+        <div class="form-group" id="songSection" style="display: none;">
+          <label class="form-label" for="song_request">Düğünde Çalmasını İstediğiniz Şarkı (İsteğe Bağlı)</label>
+          <input type="text" id="song_request" class="form-input" placeholder="Örn: Tarkan - Beni Çok Sev">
+        </div>
+
+        <!-- Note to host -->
+        <div class="form-group">
+          <label class="form-label" for="note">Ev Sahibine Not veya Tebrik Mesajınız (İsteğe Bağlı)</label>
+          <textarea id="note" class="form-textarea" placeholder="Mesajınız..."></textarea>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn-primary" id="btnSubmitRsvp">
+          <span>Yanıtı Gönder</span>
+        </button>
+      </form>
+    </main>
+
+    <!-- Success Feedback View Card -->
+    <div class="rsvp-card success-card" id="successCard" style="display: none;">
+      <h2 style="font-family: var(--font-serif); font-size: 2rem; color: var(--text-main); margin-bottom: 12px;">
+        Yanıtınız Alındı
+      </h2>
+      <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 28px;" id="successSummaryText">
+        Katılım bildiriminiz ev sahibine başarıyla iletildi. Teşekkür ederiz.
+      </p>
+
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        <button class="btn-primary" onclick="addToCalendar()">
+          Takvime Ekle (Google Calendar)
+        </button>
+        <button class="btn-secondary" onclick="reeditForm()" style="justify-content: center;">
+          Yanıtı Düzenle
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Full Image Zoom Modal -->
+  <div class="modal-overlay" id="imageModal" onclick="closeImageModal()">
+    <div style="max-width: 90%; max-height: 90vh; text-align: center;">
+      <img id="fullSizeImg" src="" alt="Davetiye Görseli" style="max-width: 100%; max-height: 85vh; border-radius: 4px; box-shadow: var(--shadow-card);">
+      <div style="color: #fff; margin-top: 12px; font-size: 0.85rem;">Kapatmak için ekrana dokunun</div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast">Yanıtınız kaydedildi!</div>
+
+  <script src="/js/guest.js?v=20260811-8"></script>
+</body>
+</html>

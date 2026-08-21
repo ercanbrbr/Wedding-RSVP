@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Yönetici Girişi | LCV</title>
+  <link rel="stylesheet" href="/css/style.css?v=20260811-7">
+</head>
+<body>
+  <div class="container page-shell auth-shell">
+    <nav class="page-nav" aria-label="Ana navigasyon">
+      <a class="brand-mark" href="/">Davet</a>
+      <a class="quiet-link" href="/">Etkinlik oluştur</a>
+    </nav>
+    <div class="glass-card auth-card">
+      <div class="header-ornament">
+        <span class="eyebrow">Güvenli Yönetim</span>
+        <h1 class="event-title" id="loginTitle">Yönetici Girişi</h1>
+        <p id="loginDescription" style="color: var(--text-muted);">Davetli bağlantınızdaki etkinlik kodunu ve yönetici parolanızı girin.</p>
+      </div>
+      <form id="loginForm">
+        <div class="form-group" id="eventCodeGroup">
+          <label class="form-label" for="event_code">Etkinlik Kodu veya Davetli Bağlantısı</label>
+          <input id="event_code" class="form-input" autocomplete="username" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="password">Yönetici Parolası</label>
+          <input type="password" id="password" class="form-input" minlength="12" maxlength="128" autocomplete="current-password" required>
+        </div>
+        <div class="form-group" id="confirmGroup" style="display:none;">
+          <label class="form-label" for="password_confirm">Parolayı Tekrar Girin</label>
+          <input type="password" id="password_confirm" class="form-input" minlength="12" maxlength="128" autocomplete="new-password">
+        </div>
+        <p id="loginError" role="alert" style="color: var(--declined-color); min-height: 24px;"></p>
+        <button type="submit" id="loginButton" class="btn-primary">Giriş Yap</button>
+      </form>
+    </div>
+  </div>
+  <script src="/js/auth.js?v=20260811-1"></script>
+</body>
+</html>

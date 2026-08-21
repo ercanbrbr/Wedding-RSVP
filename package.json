@@ -1,0 +1,25 @@
+{
+  "name": "wedding-event-rsvp",
+  "version": "1.0.0",
+  "description": "Self-Hosted Event & LCV (RSVP) Management System",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [
+    "rsvp",
+    "wedding",
+    "event-management",
+    "lcv",
+    "self-hosted"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2",
+    "multer": "^2.2.0",
+    "pdfkit": "^0.19.1",
+    "sqlite3": "^6.0.1"
+  }
+}

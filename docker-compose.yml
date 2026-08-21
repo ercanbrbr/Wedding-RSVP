@@ -1,0 +1,28 @@
+services:
+  wedding-rsvp:
+    build: .
+    image: wedding-rsvp:local
+    restart: unless-stopped
+    ports:
+      - "${BIND_ADDRESS:-127.0.0.1}:${APP_PORT:-3000}:3000"
+    volumes:
+      - wedding-data:/app/storage
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      HOST: 0.0.0.0
+      DATA_DIR: /app/storage/data
+      UPLOADS_DIR: /app/storage/uploads
+      TRUST_PROXY: "${TRUST_PROXY:-0}"
+      SETUP_KEY: "${SETUP_KEY:?SETUP_KEY must be set in .env}"
+      SECURE_COOKIES: "${SECURE_COOKIES:-0}"
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:3000/health',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  wedding-data:
+    name: ${DATA_VOLUME_NAME:-wedding-rsvp-data}
