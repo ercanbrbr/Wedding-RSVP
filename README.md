@@ -8,6 +8,8 @@ Yönetim panelindeki **Tasarım Düzenleyici** ekranı, ayarları ve canlı dave
 
 Yüklediğiniz davetiye görseli zarfın içinden çıkar. Görsel yoksa isimlerinizin bulunduğu kart gösterilir. Düzenleyici genel görünüm, zarf açılışı, logo, isimler, alt yazı, mesaj, giyim kodu, program ve katılım formu sırasını izler.
 
+Davetli sayfası büyük isimler, ince çizgiler, davetiye görseli, tarih/mekân ve günün akışıyla bir davetiye olarak açılır. Katılım alanları **Yanıtınızı iletin** düğmesinin arkasındadır. Yemek, misafir ve şarkı tercihleri katılmayı seçince görünür. Mobilde görsel isimlerin altında yer alır; yönetim paneli aynı kalır.
+
 Çift isimleri ve logo için 32 açık lisanslı, ücretsiz font hazırdır. Fontlar siteyle birlikte sunulur; font yükleme veya harici font servisi gerekmez. Kaynak ve lisans bilgileri [font açıklamasında](public/fonts/README.md) bulunur.
 
 ## Paylaşım önizlemesi

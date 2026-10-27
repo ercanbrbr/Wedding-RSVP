@@ -103,6 +103,7 @@ function renderEventDetails(event) {
   document.title = event.share_title || `${coupleName} | Davetlisiniz`;
 
   renderSeparatedNames(document.getElementById('eventCalligraphyTitle'), coupleName, 'couple');
+  document.getElementById('invitationSignoff').textContent = coupleName;
 
   const subtitleEl = document.getElementById('eventSubtitle');
   const subtitle = event.invitation_subtitle
@@ -162,10 +163,13 @@ function renderEventDetails(event) {
   const imgFrame = document.getElementById('invitationImageFrame');
   const imgEl = document.getElementById('invitationImg');
   if (event.invitation_image_url && event.invitation_image_url.trim()) {
-    imgEl.src = event.invitation_image_url;
+    if (imgEl.getAttribute('src') !== event.invitation_image_url) imgEl.src = event.invitation_image_url;
     imgFrame.style.display = 'block';
+    document.querySelector('.invitation-header').classList.add('has-image');
   } else {
     imgFrame.style.display = 'none';
+    imgEl.removeAttribute('src');
+    document.querySelector('.invitation-header').classList.remove('has-image');
   }
 
   // Live Countdown Timer
@@ -179,10 +183,10 @@ function renderEventDetails(event) {
 
   // Form Feature Toggles
   const mealSection = document.getElementById('mealSection');
-  if (mealSection) mealSection.style.display = event.enable_meal_choice ? 'block' : 'none';
+  if (mealSection) mealSection.style.display = event.enable_meal_choice && selectedStatus === 'ATTENDING' ? 'block' : 'none';
 
   const songSection = document.getElementById('songSection');
-  if (songSection) songSection.style.display = event.enable_song_request ? 'block' : 'none';
+  if (songSection) songSection.style.display = event.enable_song_request && selectedStatus === 'ATTENDING' ? 'block' : 'none';
 
   // Dates & Times
   const dateObj = new Date(event.event_date);
@@ -198,6 +202,10 @@ function renderEventDetails(event) {
   });
 
   document.getElementById('eventDateStr').textContent = formattedDate;
+  document.getElementById('invitationYear').textContent = dateObj.getFullYear();
+  document.getElementById('heroDateCaption').textContent = dateObj.toLocaleDateString('tr-TR', {
+    day: 'numeric', month: 'long', year: 'numeric'
+  }).toLocaleUpperCase('tr-TR');
   document.getElementById('eventTimeStr').textContent = `Saat: ${formattedTime}`;
   document.getElementById('eventLocation').textContent = event.location;
 
@@ -248,9 +256,9 @@ function renderMealPills(optionsStr) {
   container.innerHTML = options.map((opt, index) => {
     const isSelected = selectedMeal === opt;
     return `
-      <div class="meal-pill ${isSelected ? 'selected' : ''}" data-meal-index="${index}">
+      <button type="button" class="meal-pill ${isSelected ? 'selected' : ''}" data-meal-index="${index}" aria-pressed="${isSelected}">
         ${escapeHtml(opt)}
-      </div>
+      </button>
     `;
   }).join('');
   container.querySelectorAll('[data-meal-index]').forEach((element) => {
@@ -386,12 +394,34 @@ function openImageModal() {
   if (imgModal && fullImg && invImg) {
     fullImg.src = invImg.src;
     imgModal.classList.add('active');
+    imgModal.querySelector('button').focus();
   }
 }
 
 function closeImageModal() {
   const imgModal = document.getElementById('imageModal');
-  if (imgModal) imgModal.classList.remove('active');
+  if (imgModal?.classList.contains('active')) {
+    imgModal.classList.remove('active');
+    document.getElementById('invitationImageFrame').focus({ preventScroll: true });
+  }
+}
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape') closeImageModal();
+});
+document.getElementById('invitationImg').addEventListener('error', () => {
+  document.getElementById('invitationImageFrame').style.display = 'none';
+  document.querySelector('.invitation-header').classList.remove('has-image');
+});
+
+function openRsvp() {
+  const card = document.getElementById('rsvpFormCard');
+  card.style.display = 'block';
+  document.getElementById('successCard').style.display = 'none';
+  document.getElementById('rsvpDetails').open = true;
+  if (existingGuestToken) document.getElementById('updateBanner').style.display = 'flex';
+  card.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+  document.getElementById('guest_name').focus({ preventScroll: true });
 }
 
 async function loadExistingResponse(guestToken) {
@@ -448,6 +478,7 @@ async function loadExistingResponse(guestToken) {
       document.getElementById('note').value = resp.note || '';
 
       document.getElementById('updateBanner').style.display = 'flex';
+      document.querySelector('.reply-label-closed').textContent = 'Yanıtınızı güncelleyin';
       const btnSubmit = document.getElementById('btnSubmitRsvp');
       if (btnSubmit) {
         btnSubmit.innerHTML = '<span>Yanıtı Güncelle</span>';
@@ -483,6 +514,9 @@ function selectStatus(status) {
   }
   btnAttending.setAttribute('aria-pressed', String(status === 'ATTENDING'));
   btnDeclined.setAttribute('aria-pressed', String(status === 'DECLINED'));
+  document.querySelectorAll('#plusOnesInputs input, #plusOnesInputs select').forEach(input => {
+    input.disabled = status !== 'ATTENDING' || !hasPlusOnes;
+  });
 }
 
 function selectMeal(mealName) {
@@ -490,6 +524,7 @@ function selectMeal(mealName) {
   document.getElementById('meal_choice').value = mealName;
 
   document.querySelectorAll('.meal-pill').forEach(pill => {
+    pill.setAttribute('aria-pressed', String(pill.textContent.trim() === mealName));
     if (pill.textContent.trim() === mealName) {
       pill.classList.add('selected');
     } else {
@@ -516,6 +551,9 @@ function setPlusOnesToggle(enable) {
   }
   toggleYes.setAttribute('aria-pressed', String(enable));
   toggleNo.setAttribute('aria-pressed', String(!enable));
+  document.querySelectorAll('#plusOnesInputs input, #plusOnesInputs select').forEach(input => {
+    input.disabled = !enable || selectedStatus !== 'ATTENDING';
+  });
 }
 
 const rsvpForm = document.getElementById('rsvpForm');
@@ -616,10 +654,8 @@ if (rsvpForm) {
 }
 
 function reeditForm() {
-  document.getElementById('successCard').style.display = 'none';
-  document.getElementById('rsvpFormCard').style.display = 'block';
+  openRsvp();
   document.getElementById('updateBanner').style.display = 'flex';
-  document.getElementById('rsvpFormCard').scrollIntoView({ behavior: 'smooth' });
 }
 
 function addToCalendar() {

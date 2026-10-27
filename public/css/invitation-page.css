@@ -1,0 +1,141 @@
+/* The guest invitation is an editorial page; management styles remain separate. */
+body.invitation-page {
+  --invitation-paper: var(--custom-bg-color, var(--theme-bg));
+  --invitation-ink: var(--custom-text-color, var(--theme-text));
+  --invitation-accent: var(--custom-accent-color, var(--theme-primary));
+  --invitation-line: color-mix(in srgb, var(--invitation-accent) 28%, transparent);
+  --invitation-muted: color-mix(in srgb, var(--invitation-ink) 68%, var(--invitation-paper));
+  padding: 0;
+  background-image: none;
+  color: var(--invitation-ink);
+}
+.invitation-page::before, .invitation-page::after { display: none; }
+.invitation-page .invitation-document { max-width: 1180px; padding: 0 64px; }
+.invitation-masthead { display: flex; justify-content: space-between; align-items: center; gap: 18px; padding: 28px 0; border-bottom: 1px solid var(--invitation-line); font-size: .59rem; letter-spacing: .2em; color: var(--invitation-muted); }
+.invitation-masthead > :nth-child(2) { font-size: 1.3rem; color: var(--invitation-accent); }
+.invitation-page .invitation-header { display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; gap: 50px; padding: 72px 0 64px; margin: 0; border: 0; border-radius: 0; background: none; box-shadow: none; overflow: visible; }
+.invitation-page .invitation-header::before, .invitation-page .invitation-header::after { display: none; }
+.invitation-page .invitation-header.has-image { grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr); }
+.invitation-hero-copy { position: relative; isolation: isolate; width: 100%; max-width: 720px; margin: 0 auto; padding: 26px 16px; text-align: center; }
+.invitation-hero-copy::before { content: ''; position: absolute; inset: 4px 4% 52px; border: 1px solid var(--invitation-line); border-bottom: 0; border-radius: 50% 50% 0 0; mask-image: linear-gradient(#000 25%, transparent 85%); z-index: -1; pointer-events: none; }
+.invitation-page .crest-header { margin: 0 0 28px; }
+.invitation-page .crest-header::after { display: none; }
+.invitation-page .crest-monogram { width: 76px; height: 76px; background: var(--invitation-paper); font-size: 1.5rem; box-shadow: none; border-color: var(--invitation-line); }
+.invitation-page .crest-monogram.minimal { width: auto; height: auto; }
+.invitation-page .crest-monogram.diamond { margin: 12px auto 24px; }
+.invitation-page .invitation-eyebrow { font-family: var(--font-ui); color: var(--invitation-muted); font-size: .6rem; font-weight: 500; letter-spacing: .2em; line-height: 1.8; text-transform: uppercase; }
+.invitation-page .wedding-calligraphy { position: relative; margin: 24px auto 22px; padding: 0 .05em; font-size: clamp(3.3rem, 7.5vw, 6.4rem); font-weight: 400; letter-spacing: -.025em; line-height: 1.15; text-shadow: none; overflow-wrap: anywhere; }
+.invitation-page .wedding-calligraphy.has-separated-names { display: flex; flex-direction: column; gap: 0; }
+.invitation-page .couple-name-part { white-space: normal; max-width: 100%; overflow-wrap: anywhere; }
+.invitation-page .couple-name-joiner { position: static; font-family: 'Cormorant Garamond', Georgia, serif; font-size: .44em; font-style: italic; margin: 3px 0 6px; line-height: 1; }
+.invitation-page .event-title-subtitle { margin: 0; color: var(--invitation-muted); font-size: 1.1rem; gap: 18px; }
+.invitation-page .event-title-subtitle::before, .invitation-page .event-title-subtitle::after { width: 22px; background: var(--invitation-line); }
+.invitation-botanical { display: block; width: 160px; height: 48px; margin: 24px auto 12px; color: var(--invitation-accent); opacity: .8; }
+.invitation-page .welcome-quote { margin: 12px auto 24px; padding: 0 !important; max-width: 400px; font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(1.25rem, 2.2vw, 1.55rem); line-height: 1.6; font-style: italic; color: var(--invitation-ink); white-space: pre-line; }
+.invitation-page .welcome-quote::before { display: none; }
+.hero-date-caption { font-size: .67rem; letter-spacing: .18em; margin-top: 22px; line-height: 1.8; color: var(--invitation-muted); }
+.invitation-page .invitation-link { display: inline-flex; align-items: center; justify-content: center; gap: 16px; padding: 9px 0; border: 0; border-bottom: 1px solid var(--invitation-line); border-radius: 0; background: none; font-family: var(--font-ui); font-size: .76rem; font-weight: 500; line-height: 1.6; color: var(--invitation-ink); text-decoration: none; cursor: pointer; box-shadow: none; }
+.invitation-link span[aria-hidden] { color: var(--invitation-accent); font-size: 1.1rem; }
+.invitation-page .hero-rsvp-link { margin-top: 20px; }
+.invitation-page .invitation-image-card { width: 100%; max-width: 430px; margin: 0 auto; padding: 14px 14px 0; align-self: center; border: 1px solid var(--invitation-line); border-radius: 1px; outline: 0; background: color-mix(in srgb, var(--invitation-paper) 94%, var(--invitation-accent)); box-shadow: 12px 18px 40px #0000000c; transform: rotate(1.5deg); overflow: hidden; }
+.invitation-page .invitation-image-card:hover { transform: rotate(0); }
+.invitation-page .invitation-image-card img { display: block; width: 100%; height: auto; max-height: none; aspect-ratio: auto; object-fit: contain; border-radius: 0; }
+.invitation-page .image-overlay-hint { position: static; display: flex; align-items: center; justify-content: space-between; padding: 17px 2px; background: none; color: var(--invitation-muted); opacity: 1; transform: none; font-size: .55rem; letter-spacing: .15em; }
+.invitation-countdown { text-align: center; padding: 36px 0 50px; border-bottom: 1px solid var(--invitation-line); }
+.invitation-page .countdown-box { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; width: min(100%, 480px); margin: 20px auto 0; padding: 0; background: none; border: 0; box-shadow: none; }
+.invitation-page .countdown-card { min-width: 0; padding: 0 12px; background: none; border: 0; border-radius: 0; box-shadow: none; overflow: visible; }
+.invitation-page .countdown-card + .countdown-card { border-left: 1px solid var(--invitation-line); }
+.invitation-page .countdown-card::before { display: none; }
+.invitation-page .countdown-number { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(2.4rem, 5vw, 3.5rem); font-weight: 400; font-variant-numeric: tabular-nums; line-height: 1.1; color: var(--invitation-ink); }
+.invitation-page .countdown-label { margin-top: 9px; font-size: .55rem; letter-spacing: .13em; color: var(--invitation-muted); }
+.invitation-gathering { display: grid; grid-template-columns: 1fr 1.25fr; gap: 70px; padding: 80px 0; align-items: start; }
+.invitation-page .invitation-section-heading h2, .invitation-page .section-heading, .invitation-rsvp-intro h2, .invitation-page .success-card h2 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(2.5rem, 4.5vw, 3.8rem); font-weight: 400; line-height: 1.1; letter-spacing: -.025em; margin: 16px 0 28px; color: var(--invitation-ink) !important; }
+.invitation-section-heading em, .invitation-rsvp-intro em { color: var(--invitation-accent); font-weight: 400; }
+.invitation-page .hero-event-info { display: grid; gap: 28px; margin: 0; padding: 0; border: 0; border-radius: 0; background: none; text-align: left; }
+.invitation-page .hero-info-row { display: flex; flex-direction: column; align-items: flex-start; gap: 9px; padding: 0 0 26px; border: 0; border-bottom: 1px solid var(--invitation-line); }
+.invitation-detail-label { font-size: .58rem; letter-spacing: .18em; color: var(--invitation-muted); }
+.invitation-page .hero-info-row strong { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.85rem; font-weight: 500; line-height: 1.25; color: var(--invitation-ink); overflow-wrap: anywhere; }
+.invitation-page .hero-subtext { font-size: .82rem; color: var(--invitation-muted); }
+.invitation-page .hero-info-row .invitation-link { margin: 0; font-size: .72rem; }
+.invitation-page .timeline-section { margin: 0; padding: 50px 0 65px; border-top: 1px solid var(--invitation-line); text-align: center; }
+.invitation-page .timeline-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 32px 0; margin: 42px 0 0; padding: 0; border: 0; }
+.invitation-page .timeline-item { position: relative; flex: 1 1 170px; max-width: 280px; margin: 0; padding: 25px 20px 0; border-top: 1px solid var(--invitation-line); text-align: center; }
+.invitation-page .timeline-dot { top: -4px; left: calc(50% - 4px); width: 7px; height: 7px; border: 0; border-radius: 50%; background: var(--invitation-accent); box-shadow: 0 0 0 5px var(--invitation-paper); }
+.invitation-page .timeline-time { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.7rem; font-weight: 500; color: var(--invitation-accent); }
+.invitation-page .timeline-title { margin-top: 8px; color: var(--invitation-ink); font-size: .82rem; line-height: 1.7; overflow-wrap: anywhere; }
+.invitation-note { gap: 26px; max-width: 670px; margin: 15px auto 65px; align-items: flex-start; }
+.invitation-note-mark { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 6rem; line-height: 1; color: var(--invitation-accent); }
+#eventDescription { margin-top: 14px; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.5rem; line-height: 1.65; white-space: pre-wrap; overflow-wrap: anywhere; }
+.invitation-page .rsvp-card { margin: 10px 0 0; padding: 64px 28px; border: 0; border-top: 1px solid var(--invitation-line); border-bottom: 1px solid var(--invitation-line); border-radius: 0; background: color-mix(in srgb, var(--invitation-accent) 4%, var(--invitation-paper)); box-shadow: none; overflow: visible; }
+.invitation-page .rsvp-card::before { display: none; }
+.invitation-rsvp-intro, .invitation-page .success-card { text-align: center; }
+.invitation-small-flower { display: block; margin-bottom: 26px; font-size: 2.6rem; color: var(--invitation-accent); line-height: 1; }
+.invitation-rsvp-intro h2 { margin-bottom: 18px; }
+.invitation-rsvp-intro > p:last-child { font-size: .85rem; line-height: 1.9; color: var(--invitation-muted); }
+.invitation-reply { max-width: 560px; margin: 28px auto 0; }
+.invitation-reply > summary { display: flex; align-items: center; justify-content: center; gap: 30px; width: fit-content; max-width: 100%; margin: auto; padding: 16px 26px; background: var(--invitation-ink); color: var(--invitation-paper); border: 1px solid var(--invitation-ink); border-radius: 40px; font-size: .8rem; list-style: none; cursor: pointer; }
+.invitation-reply > summary::-webkit-details-marker { display: none; }
+.invitation-reply .reply-label-open, .invitation-reply[open] .reply-label-closed { display: none; }
+.invitation-reply[open] .reply-label-open { display: inline; }
+.invitation-reply[open] > summary { background: none; color: var(--invitation-ink); border-color: var(--invitation-line); }
+.invitation-reply-body { margin-top: 36px; padding-top: 32px; border-top: 1px solid var(--invitation-line); }
+.invitation-page .form-group { margin-bottom: 28px; }
+.invitation-page .form-label { color: var(--invitation-ink); font-size: .85rem; font-weight: 400; margin-bottom: 12px; }
+.invitation-page .form-input, .invitation-page .form-textarea, .invitation-page .form-select { background: transparent; border: 0; border-bottom: 1px solid var(--invitation-line); border-radius: 0; padding: 12px 0; color: var(--invitation-ink); font-size: 1rem; box-shadow: none; }
+.invitation-page .form-textarea { min-height: 90px; }
+.invitation-page input::placeholder, .invitation-page textarea::placeholder { color: var(--invitation-muted); opacity: .8; }
+.invitation-page .form-select option { background: var(--invitation-paper); color: var(--invitation-ink); }
+.invitation-page :is(button, a, input, textarea, select, summary):focus-visible { outline: 2px solid var(--invitation-accent); outline-offset: 5px; }
+.invitation-page .status-grid { gap: 12px; margin-bottom: 0; }
+.invitation-page .status-btn { display: flex; flex-direction: column; gap: 6px; min-height: 84px; height: auto; padding: 16px 10px; background: transparent; border: 1px solid var(--invitation-line); border-radius: 2px; color: var(--invitation-ink); font-weight: 400; box-shadow: none; }
+.invitation-page .status-btn small { font-size: .65rem; opacity: .7; }
+.invitation-page .status-btn.selected, .invitation-page .status-btn:hover { border-color: var(--invitation-accent); background: color-mix(in srgb, var(--invitation-accent) 10%, var(--invitation-paper)); color: var(--invitation-ink); box-shadow: none; transform: none; }
+.invitation-page .plus-ones-card { padding: 22px 0 0; margin-bottom: 28px; background: none; border: 0; border-top: 1px solid var(--invitation-line); border-radius: 0; }
+.invitation-page .toggle-group { flex-wrap: wrap; }
+.invitation-page .toggle-btn { height: auto; min-height: 44px; padding: 12px; border-radius: 30px; background: none; color: var(--invitation-ink); border-color: var(--invitation-line); font-size: .74rem; }
+.invitation-page .meal-pill { border-radius: 30px; font-size: .75rem; font-weight: 400; color: var(--invitation-ink); background: none; border-color: var(--invitation-line); }
+.invitation-page .toggle-btn.active, .invitation-page .meal-pill.selected { background: color-mix(in srgb, var(--invitation-accent) 12%, var(--invitation-paper)); border-color: var(--invitation-accent); color: var(--invitation-ink); box-shadow: none; transform: none; }
+.invitation-page .plus-one-guest-card { background: none !important; border-color: var(--invitation-line) !important; }
+.invitation-page #btnSubmitRsvp { width: 100%; background: var(--invitation-ink) !important; color: var(--invitation-paper); border-color: var(--invitation-ink) !important; box-shadow: none; font-size: .85rem; }
+.invitation-page .info-banner { background: none; border: 1px solid var(--invitation-line); color: var(--invitation-ink); padding: 16px; font-size: .8rem; margin-bottom: 30px; }
+.invitation-page .info-banner p { margin-top: 6px; line-height: 1.6; }
+.invitation-page #successSummaryText { max-width: 460px; margin: auto; line-height: 1.9; color: var(--invitation-muted); font-size: .9rem; }
+.invitation-success-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 24px; margin-top: 28px; }
+.invitation-footer { padding: 54px 0 72px; text-align: center; color: var(--invitation-muted); font-family: 'Cormorant Garamond', Georgia, serif; font-size: 1.1rem; font-style: italic; }
+.invitation-footer p { margin: 12px 0 20px; font-family: var(--font-couple-names); font-size: clamp(2rem, 5vw, 3rem); color: var(--invitation-accent); font-style: normal; overflow-wrap: anywhere; }
+.invitation-page #fullSizeImg { max-width: 92vw; max-height: 88dvh; object-fit: contain; }
+.invitation-page .image-close-button { position: absolute; top: 18px; right: 18px; width: 44px; height: 44px; border: 1px solid #ffffff60; border-radius: 50%; background: #00000030; color: #fff; cursor: pointer; }
+.invitation-page .invitation-music-toggle { font-size: .72rem; padding: 10px 16px; }
+@media (max-width: 850px) {
+  .invitation-page .invitation-document { padding: 0 28px; }
+  .invitation-page .invitation-header { padding-top: 42px; gap: 32px; }
+  .invitation-page .invitation-header.has-image { grid-template-columns: minmax(0, 1fr); }
+  .invitation-page .wedding-calligraphy { font-size: clamp(3.8rem, 11vw, 6rem); }
+  .invitation-page .invitation-image-card { max-width: 390px; }
+  .invitation-gathering { gap: 32px; }
+}
+@media (max-width: 560px) {
+  .invitation-page .invitation-document { padding: 0 22px; }
+  .invitation-masthead { padding: 22px 0; font-size: .5rem; letter-spacing: .13em; }
+  .invitation-page .invitation-header { padding: 32px 0 44px; }
+  .invitation-hero-copy { padding: 24px 5px 12px; }
+  .invitation-page .wedding-calligraphy { font-size: clamp(3.1rem, 15vw, 5rem); }
+  .invitation-page .welcome-quote { font-size: 1.35rem; padding: 0 10px !important; }
+  .invitation-page .invitation-image-card { max-width: calc(100% - 14px); padding: 10px 10px 0; }
+  .invitation-gathering { grid-template-columns: minmax(0, 1fr); gap: 24px; padding: 48px 0; }
+  .invitation-section-heading { text-align: center; }
+  .invitation-page .hero-event-info { text-align: center; }
+  .invitation-page .hero-info-row { align-items: center; }
+  .invitation-page .hero-info-row strong { font-size: 1.7rem; }
+  .invitation-page .timeline-section { padding: 42px 0; }
+  .invitation-page .timeline-item { flex-basis: 50%; padding-inline: 10px; }
+  .invitation-note { gap: 12px; margin-bottom: 40px; }
+  .invitation-note-mark { font-size: 4rem; }
+  #eventDescription { font-size: 1.3rem; }
+  .invitation-page .rsvp-card { padding: 44px 10px; }
+  .invitation-page .countdown-card { padding-inline: 4px; }
+  .invitation-page .status-btn { font-size: .76rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .invitation-page .invitation-image-card { transition: none; transform: none; }
+}
