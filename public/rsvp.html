@@ -6,31 +6,26 @@
   <title>Düğün Davetiyesi & LCV Formu</title>
   <link rel="stylesheet" href="/css/style.css?v=20261027-4">
   <link rel="stylesheet" href="/css/invitation-experience.css?v=20261027-6">
-  <link rel="stylesheet" href="/css/invitation-page.css?v=20261027-9">
+  <link rel="stylesheet" href="/css/invitation-page.css?v=20261027-10">
 </head>
 <body class="theme-warm_ivory invitation-loading invitation-page">
   <div class="container invitation-document" hidden>
+    <div class="invitation-masthead"><span>SEVGİYLE DAVETLİSİNİZ</span><span aria-hidden="true">✧</span><span id="invitationYear"></span></div>
     <header class="invitation-header">
       <div class="invitation-hero-copy">
         <div class="crest-header"><div class="crest-monogram circle" id="crestMonogram"></div></div>
+        <p class="invitation-eyebrow">BİRLİKTE, EN GÜZEL GÜNE</p>
         <h1 class="wedding-calligraphy" id="eventCalligraphyTitle"></h1>
         <div class="event-title-subtitle" id="eventSubtitle"></div>
+        <svg class="invitation-botanical" viewBox="0 0 200 60" fill="none" stroke="currentColor" stroke-width="1.1" aria-hidden="true"><path d="M18 42C55 43 76 20 100 30C124 20 145 43 182 42M100 30V49M35 41C24 28 27 18 40 20C47 30 42 37 35 41ZM55 35C48 19 55 11 64 14C69 25 62 32 55 35ZM76 28C77 13 86 9 91 17C91 25 84 28 76 28ZM165 41C176 28 173 18 160 20C153 30 158 37 165 41ZM145 35C152 19 145 11 136 14C131 25 138 32 145 35ZM124 28C123 13 114 9 109 17C109 25 116 28 124 28"/></svg>
+        <div class="welcome-quote" id="welcomeMessageText" style="display: none;"></div>
+        <p class="hero-date-caption" id="heroDateCaption"></p>
+        <button type="button" class="invitation-link hero-rsvp-link" onclick="openRsvp()">Bizimle kutlayın <span aria-hidden="true">↗</span></button>
       </div>
       <button type="button" class="invitation-image-card" id="invitationImageFrame" style="display: none;" onclick="openImageModal()" aria-label="Davetiye görselini büyüt">
         <img id="invitationImg" alt="Davetiye görseli" decoding="async">
         <span class="image-overlay-hint">YAKINDAN BAKIN <span aria-hidden="true">↗</span></span>
       </button>
-      <div class="invitation-hero-note">
-        <p class="invitation-eyebrow side-note-heading">BULUŞMA NOTLARI</p>
-      <div class="hero-event-info">
-        <div class="hero-info-row"><span class="invitation-detail-label">NE ZAMAN</span><strong id="eventDateStr"></strong><span id="eventTimeStr" class="hero-subtext"></span><button type="button" class="invitation-link" onclick="addToCalendar()">Takviminize ekleyin <span aria-hidden="true">↗</span></button></div>
-        <div class="hero-info-row"><span class="invitation-detail-label">NEREDE</span><strong id="eventLocation"></strong><a id="mapLink" target="_blank" rel="noopener noreferrer" class="map-btn invitation-link">Yol tarifi alın <span aria-hidden="true">↗</span></a></div>
-        <div class="hero-info-row" id="dressCodeContainer" style="display: none;"><span class="invitation-detail-label">GİYİM NOTU</span><strong id="dressCodeBadge"></strong></div>
-      </div>
-
-        <div class="welcome-quote" id="welcomeMessageText" style="display: none;"></div>
-        <button type="button" class="invitation-link hero-rsvp-link" onclick="openRsvp()">Bizimle kutlayın <span aria-hidden="true">↗</span></button>
-      </div>
     </header>
 
     <section class="invitation-countdown" aria-label="Davet gününe kalan süre">
@@ -44,6 +39,15 @@
     </section>
 
 
+
+    <section class="invitation-gathering" aria-labelledby="gatheringTitle">
+      <div class="invitation-section-heading"><p class="invitation-eyebrow">BULUŞACAĞIMIZ AN</p><h2 id="gatheringTitle">Aynı yerde,<br><em>aynı mutlulukta.</em></h2></div>
+      <div class="hero-event-info">
+        <div class="hero-info-row"><span class="invitation-detail-label">NE ZAMAN</span><strong id="eventDateStr"></strong><span id="eventTimeStr" class="hero-subtext"></span><button type="button" class="invitation-link" onclick="addToCalendar()">Takviminize ekleyin <span aria-hidden="true">↗</span></button></div>
+        <div class="hero-info-row"><span class="invitation-detail-label">NEREDE</span><strong id="eventLocation"></strong><a id="mapLink" target="_blank" rel="noopener noreferrer" class="map-btn invitation-link">Yol tarifi alın <span aria-hidden="true">↗</span></a></div>
+        <div class="hero-info-row" id="dressCodeContainer" style="display: none;"><span class="invitation-detail-label">GİYİM NOTU</span><strong id="dressCodeBadge"></strong></div>
+      </div>
+    </section>
 
     <section class="timeline-section" id="timelineSection" style="display: none;" aria-labelledby="scheduleTitle"><p class="invitation-eyebrow">HER ANINI BİRLİKTE</p><h2 class="section-heading" id="scheduleTitle">Günün akışı</h2><div class="timeline-list" id="timelineContainer"></div></section>
     <section class="invitation-note" id="descriptionContainer" style="display: none;"><span class="invitation-note-mark" aria-hidden="true">“</span><div><p class="invitation-eyebrow">SİZE BİR NOTUMUZ VAR</p><p id="eventDescription"></p></div></section>
@@ -126,6 +130,6 @@
   <div class="modal-overlay" id="imageModal" onclick="closeImageModal()" role="dialog" aria-modal="true" aria-label="Davetiye görseli"><button type="button" class="image-close-button" onclick="closeImageModal()" aria-label="Görseli kapat">✕</button><img id="fullSizeImg" alt="Davetiye görseli, tam boyut"></div>
   <div class="toast" id="toast" role="status">Yanıtınız kaydedildi!</div>
   <script src="/js/invitation-experience.js?v=20261027-4"></script>
-  <script src="/js/guest.js?v=20261027-9"></script>
+  <script src="/js/guest.js?v=20261027-10"></script>
 </body>
 </html>
