@@ -6,6 +6,7 @@ const multer = require('multer');
 const fs = require('fs');
 const invitationFonts = require('./public/js/font-catalog');
 const allowedFonts = new Set(invitationFonts.map(font => font.name));
+const invitationSettings = require('./public/js/invitation-settings');
 
 const envPath = path.join(__dirname, '.env');
 if (typeof process.loadEnvFile === 'function' && fs.existsSync(envPath)) {
@@ -164,6 +165,20 @@ function validHexColor(value) {
 }
 
 function validateEventInput(body) {
+  if (body.invitation_content != null) {
+    let content;
+    try { content = JSON.parse(body.invitation_content); } catch { return 'Davetiye metinleri geçersiz.'; }
+    if (!content || Array.isArray(content) || typeof content !== 'object') return 'Davetiye ayarları geçersiz.';
+    const textKeys = new Set(invitationSettings.text.map(item => item[0]));
+    const toggleKeys = new Set(invitationSettings.toggles.map(item => item[0]));
+    for (const [key, value] of Object.entries(content)) {
+      if (textKeys.has(key)) {
+        if (typeof value !== 'string' || value.length > 400) return 'Davetiye metinleri en fazla 400 karakter olabilir.';
+      } else if (toggleKeys.has(key)) {
+        if (typeof value !== 'boolean') return 'Bölüm görünürlüğü geçersiz.';
+      } else if (key !== 'ornament' || !['floral', 'simple', 'none'].includes(value)) return 'Davetiye süsleme ayarı geçersiz.';
+    }
+  }
   const title = String(body.title || '').trim();
   const location = String(body.location || '').trim();
   if (!title || !location || !body.event_date) return 'Başlık, tarih ve mekan alanları zorunludur.';
@@ -622,7 +637,7 @@ app.put('/api/admin/:adminToken', async (req, res) => {
       invitation_image_url, theme_style, custom_font, custom_accent_color, custom_bg_color, custom_text_color,
       custom_meal_options, custom_base_url, welcome_message, dress_code, event_schedule, crest_style, crest_text, crest_font,
       enable_meal_choice, enable_song_request, hall_width, hall_height, music_url, music_volume, invitation_subtitle,
-      share_title, share_description, share_image_url
+      share_title, share_description, share_image_url, invitation_content
     } = req.body;
 
     const event = await dbQuery.get('SELECT id FROM events WHERE admin_token = ?', [adminToken]);
@@ -649,7 +664,7 @@ app.put('/api/admin/:adminToken', async (req, res) => {
            hall_width = ?, hall_height = ?, music_url = COALESCE(?, music_url), music_volume = COALESCE(?, music_volume),
            invitation_subtitle = COALESCE(?, invitation_subtitle),
            share_title = COALESCE(?, share_title), share_description = COALESCE(?, share_description),
-           share_image_url = COALESCE(?, share_image_url)
+           share_image_url = COALESCE(?, share_image_url), invitation_content = COALESCE(?, invitation_content)
        WHERE admin_token = ?`,
       [
         title.trim(),
@@ -682,6 +697,7 @@ app.put('/api/admin/:adminToken', async (req, res) => {
         share_title == null ? null : share_title.trim(),
         share_description == null ? null : share_description.trim(),
         share_image_url == null ? null : share_image_url.trim(),
+        invitation_content == null ? null : invitation_content,
         adminToken
       ]
     );
@@ -1093,6 +1109,7 @@ app.get('/api/public/:publicToken', async (req, res) => {
         title: event.title,
         couple_names: event.couple_names || event.title,
         invitation_subtitle: event.invitation_subtitle,
+        invitation_content: event.invitation_content || '{}',
         share_title: event.share_title || '',
         event_date: event.event_date,
         location: event.location,

@@ -43,6 +43,59 @@
   let closingTimer = null;
   let source = '';
   let opening = false;
+  let floatingCard = null;
+
+  function resetPresentation() {
+    clearTimeout(closingTimer);
+    floatingCard?.remove();
+    floatingCard = null;
+    envelope.classList.remove('is-opening', 'is-presenting', 'is-turning');
+  }
+
+  function presentCard() {
+    const rect = paper.getBoundingClientRect();
+    floatingCard = document.createElement('div');
+    floatingCard.className = 'invitation-card-flight';
+    floatingCard.setAttribute('aria-hidden', 'true');
+    const turner = document.createElement('div');
+    turner.className = 'invitation-card-turner';
+    const front = document.createElement('div');
+    front.className = 'invitation-card-front';
+    if (!paperImage.hidden && paperImage.naturalWidth) {
+      const img = document.createElement('img');
+      img.src = paperImage.src;
+      img.alt = '';
+      front.append(img);
+    } else {
+      const fallback = paperFallback.cloneNode(true);
+      fallback.removeAttribute('hidden');
+      fallback.querySelectorAll('[id]').forEach(node => node.removeAttribute('id'));
+      front.append(fallback);
+    }
+    const back = document.createElement('div');
+    back.className = 'invitation-card-back';
+    const names = document.createElement('span');
+    names.textContent = document.getElementById('envelopePaperNames').textContent;
+    back.append(names);
+    turner.append(front, back);
+    floatingCard.append(turner);
+    envelope.append(floatingCard);
+    const ratio = !paperImage.hidden && paperImage.naturalWidth ? paperImage.naturalWidth / paperImage.naturalHeight : 210 / 297;
+    const width = Math.min(520, innerWidth - 40, (innerHeight - 64) * ratio);
+    const height = width / ratio;
+    const finalBox = { left: `${(innerWidth - width) / 2}px`, top: `${(innerHeight - height) / 2}px`, width: `${width}px`, height: `${height}px` };
+    Object.assign(floatingCard.style, finalBox);
+    floatingCard.animate([
+      { left: `${rect.left}px`, top: `${rect.top}px`, width: `${rect.width}px`, height: `${rect.height}px` },
+      finalBox
+    ], { duration: 650, easing: 'cubic-bezier(.22,.7,.2,1)' });
+    envelope.classList.add('is-presenting');
+    // The enlarged invitation stays still for 1.6 seconds before turning.
+    closingTimer = setTimeout(() => {
+      envelope.classList.add('is-turning');
+      closingTimer = setTimeout(finishOpening, 950);
+    }, 2250);
+  }
 
   function showPaperImage(ready) {
     paperImage.hidden = !ready;
@@ -68,7 +121,7 @@
   }
   function finishOpening() {
     envelope.hidden = true;
-    envelope.classList.remove('is-opening');
+    resetPresentation();
     opening = false;
     document.body.classList.remove('envelope-visible');
     if (content) content.inert = false;
@@ -81,8 +134,12 @@
     opening = true;
     // Start playback directly from the tap, before awaiting any animation.
     play();
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      finishOpening();
+      return;
+    }
     envelope.classList.add('is-opening');
-    closingTimer = setTimeout(finishOpening, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 2000);
+    closingTimer = setTimeout(presentCard, 1150);
   });
   envelope.addEventListener('keydown', (event) => {
     if (event.key !== 'Tab') return;
@@ -137,11 +194,11 @@
         else paperImage.removeAttribute('src');
       }
       document.getElementById('envelopeSeal').textContent = event.crest_text || getInitials(event.couple_names || event.title);
+      applyInvitationContent(event);
       if (!showEnvelope) return;
-      clearTimeout(closingTimer);
+      resetPresentation();
       audio.pause();
       opening = false;
-      envelope.classList.remove('is-opening');
       envelope.hidden = false;
       document.body.classList.add('envelope-visible');
       if (content) content.inert = true;

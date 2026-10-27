@@ -45,6 +45,7 @@ function initDb() {
       title TEXT NOT NULL,
       couple_names TEXT,
       invitation_subtitle TEXT,
+      invitation_content TEXT DEFAULT '{}',
       share_title TEXT DEFAULT '',
       share_description TEXT DEFAULT '',
       share_image_url TEXT DEFAULT '',
@@ -85,6 +86,7 @@ function initDb() {
   const columnsToAdd = [
     { name: 'couple_names', type: 'TEXT' },
     { name: 'invitation_subtitle', type: 'TEXT' },
+    { name: 'invitation_content', type: "TEXT DEFAULT '{}'" },
     { name: 'share_title', type: "TEXT DEFAULT ''" },
     { name: 'share_description', type: "TEXT DEFAULT ''" },
     { name: 'share_image_url', type: "TEXT DEFAULT ''" },

@@ -21,3 +21,9 @@ Davetiye bağlantısı `/e/:publicToken`, paylaşım bilgilerini [Open Graph](ht
 ## Doğrulama
 
 `node --test tests/design-experience.test.js` komutu geçici bir veritabanıyla müzik yüklemeyi, erişim denetimini, taslak/kayıt ayrımını, fontları ve mevcut veritabanına yeni sütunların eklenmesini sınar. Gerçek etkinlik verisini değiştirmez.
+
+## Zarf açılışı ve bölüm ayarları
+
+Zarfa dokununca kart çıkar ve büyür; 1,6 saniye bekledikten sonra dönerek siteyi açar. Hareketi azaltma tercihi etkinse animasyon atlanır. Davetiye görseli sayfadaki küçük **Davetiyeyi gör** alanından tam boy açılır. İsimler ortalanır; üst bilgi şeridi gösterilmez.
+
+**Tasarım Düzenleyici → Bölüm metinleri ve süslemeler** bölümünden zarf yazıları, bölüm başlıkları, katılım mesajları, bölüm görünürlükleri ve çiçekli/sade/süslemesiz görünüm düzenlenir. Değişiklikler canlı önizlemede gösterilir, **Tasarımı Kaydet** ile yayımlanır. Yeni ayar sütunu sunucu yeniden başlatıldığında mevcut veritabanına eklenir.

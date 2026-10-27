@@ -13,6 +13,30 @@
   let active = false;
   let updateFrame = 0;
   let previousFocus = null;
+  for (const [key, label, fallback] of invitationSettings.text) {
+    const group = document.createElement('div');
+    group.className = 'form-group';
+    const caption = document.createElement('label');
+    caption.className = 'form-label';
+    caption.htmlFor = `copy_${key}`;
+    caption.textContent = label;
+    const input = document.createElement('textarea');
+    input.id = caption.htmlFor;
+    input.className = 'form-input';
+    input.rows = fallback.includes('\n') ? 3 : 2;
+    input.maxLength = 400;
+    group.append(caption, input);
+    document.getElementById('invitationCopyFields').append(group);
+  }
+  for (const [key, label] of invitationSettings.toggles) {
+    const caption = document.createElement('label');
+    caption.className = 'form-label';
+    const input = document.createElement('input');
+    input.type = 'checkbox';
+    input.id = `copy_${key}`;
+    caption.append(input, document.createTextNode(` ${label}`));
+    document.getElementById('invitationVisibilityFields').append(caption);
+  }
 
   for (const id of ['editFontFamily', 'editCrestFont']) {
     const select = document.getElementById(id);
@@ -40,6 +64,11 @@
     const draft = Object.fromEntries(Object.entries(fields).map(([key, id]) => [key, document.getElementById(id).value]));
     return {
       ...draft,
+      invitation_content: JSON.stringify({
+        ...Object.fromEntries(invitationSettings.text.map(([key]) => [key, document.getElementById(`copy_${key}`).value])),
+        ...Object.fromEntries(invitationSettings.toggles.map(([key]) => [key, document.getElementById(`copy_${key}`).checked])),
+        ornament: document.getElementById('editOrnament').value
+      }),
       crest_style: document.getElementById('editShowCrest').checked ? draft.crest_style : 'none',
       invitation_image_url: imageObjectUrl || document.getElementById('editInvitationUrl').value.trim(),
       event_schedule: JSON.stringify(getScheduleData()),
@@ -187,6 +216,10 @@
     open() {
       previousFocus = document.activeElement;
       active = true;
+      const content = invitationContent(currentEvent);
+      for (const [key, , fallback] of invitationSettings.text) document.getElementById(`copy_${key}`).value = content[key] ?? fallback;
+      for (const [key] of invitationSettings.toggles) document.getElementById(`copy_${key}`).checked = content[key] !== false;
+      document.getElementById('editOrnament').value = content.ornament || 'floral';
       clearShareFile();
       for (const key of ['share_title', 'share_description', 'share_image_url']) {
         document.getElementById(fields[key]).value = currentEvent[key] || '';

@@ -139,3 +139,32 @@ body.invitation-page {
 @media (prefers-reduced-motion: reduce) {
   .invitation-page .invitation-image-card { transition: none; transform: none; }
 }
+
+/* A single centered invitation, with a compact link to the printed artwork. */
+.invitation-page .invitation-header.has-image { grid-template-columns: minmax(0, 1fr); }
+.invitation-page .invitation-header { gap: 24px; padding-top: 44px; }
+.invitation-page .invitation-hero-copy { max-width: 680px; padding: 48px 42px 28px; }
+.invitation-page .invitation-image-card { width: fit-content; max-width: 100%; padding: 10px 18px; border: 1px solid var(--invitation-line); background: transparent; box-shadow: none; transform: none; border-radius: 4px; }
+.invitation-page .invitation-image-card:hover { transform: none; background: color-mix(in srgb, var(--invitation-accent) 5%, var(--invitation-paper)); }
+.invitation-page .invitation-image-card img { display: inline-block; width: 42px; height: 60px; vertical-align: middle; object-fit: contain; }
+.invitation-page .image-overlay-hint { display: inline-flex; vertical-align: middle; gap: 26px; margin-left: 18px; padding: 0; font-size: .67rem; letter-spacing: .03em; }
+.invitation-floral-frame { position: absolute; inset: 10px 0 0; pointer-events: none; z-index: -1; }
+.invitation-floral-frame span { position: absolute; width: 100px; height: 120px; background: var(--invitation-accent); mask: url('/images/invitation-flourish.svg') center / contain no-repeat; opacity: .55; }
+.invitation-floral-frame span:nth-child(1) { top: 0; left: 0; }
+.invitation-floral-frame span:nth-child(2) { top: 0; right: 0; transform: scaleX(-1); }
+.invitation-floral-frame span:nth-child(3) { bottom: 0; left: 0; transform: scaleY(-1); }
+.invitation-floral-frame span:nth-child(4) { bottom: 0; right: 0; transform: scale(-1); }
+.invitation-page[data-ornament='floral'] .invitation-hero-copy::before { inset: 16px 16px 12px; border-radius: 48% 48% 2px 2px; border-bottom: 1px solid var(--invitation-line); box-shadow: inset 0 0 0 6px var(--invitation-paper), inset 0 0 0 7px var(--invitation-line); mask-image: linear-gradient(#000, #0009 75%, #000); }
+.invitation-page[data-ornament='simple'] .invitation-floral-frame, .invitation-page[data-ornament='none'] .invitation-floral-frame { display: none; }
+.invitation-page .invitation-botanical { background: var(--invitation-accent); mask: url('/images/invitation-divider.svg') center / contain no-repeat; width: 200px; height: 46px; }
+.invitation-page[data-ornament='simple'] .invitation-botanical { width: 80px; height: 1px; margin-block: 32px; mask: none; }
+.invitation-page[data-ornament='floral'] .invitation-countdown { position: relative; }
+.invitation-page[data-ornament='floral'] .invitation-countdown::after { content: ''; position: absolute; left: 50%; bottom: -18px; transform: translateX(-50%); width: 150px; height: 36px; background: var(--invitation-accent); mask: url('/images/invitation-divider.svg') center / contain no-repeat; opacity: .7; }
+.invitation-page[data-ornament='none'] .invitation-botanical, .invitation-page[data-ornament='none'] .invitation-hero-copy::before, .invitation-page.hide-invitation-arch .invitation-hero-copy::before { display: none; }
+.invitation-page[data-ornament='none'] :is(.invitation-countdown, .timeline-section, .rsvp-card, .hero-info-row) { border-color: transparent; }
+.invitation-page :is(#gatheringTitle, .invitation-rsvp-intro > h2, .invitation-rsvp-intro > p, .invitation-eyebrow) { white-space: pre-line; }
+@media (max-width: 560px) {
+  .invitation-page .invitation-hero-copy { padding: 40px 24px 28px; }
+  .invitation-floral-frame span { width: 68px; height: 85px; }
+  .invitation-page .invitation-header { padding-top: 24px; }
+}

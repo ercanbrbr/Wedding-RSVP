@@ -202,7 +202,6 @@ function renderEventDetails(event) {
   });
 
   document.getElementById('eventDateStr').textContent = formattedDate;
-  document.getElementById('invitationYear').textContent = dateObj.getFullYear();
   document.getElementById('heroDateCaption').textContent = dateObj.toLocaleDateString('tr-TR', {
     day: 'numeric', month: 'long', year: 'numeric'
   }).toLocaleUpperCase('tr-TR');
@@ -239,6 +238,7 @@ function renderEventDetails(event) {
   } else {
     document.getElementById('descriptionContainer').style.display = 'none';
   }
+  applyInvitationContent(event);
 }
 
 // Dynamically Render Custom Meal Option Pills for Main Guest

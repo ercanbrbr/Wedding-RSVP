@@ -96,7 +96,27 @@
   50% { transform: translateY(-55%); z-index: 4; }
   100% { transform: translateY(-36%) scale(1.04); z-index: 4; }
 }
-.invitation-envelope.is-opening { animation: envelope-dismiss .4s 1.6s ease forwards; pointer-events: none; }
+.invitation-envelope.is-opening { pointer-events: none; }
+.is-opening .envelope-hint { opacity: 0; }
+.envelope-open { transition: opacity .3s ease; }
+.is-presenting .envelope-open { opacity: 0; }
+.invitation-card-flight { position: fixed; z-index: 6; perspective: 1600px; pointer-events: none; }
+.invitation-card-turner { position: relative; width: 100%; height: 100%; transform-style: preserve-3d; }
+.invitation-card-front, .invitation-card-back { position: absolute; inset: 0; display: grid; place-items: center; background: var(--envelope-bg); border: 1px solid color-mix(in srgb, var(--envelope-accent) 35%, transparent); box-shadow: 0 22px 70px #00000025; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
+.invitation-card-front > img { width: 100%; height: 100%; object-fit: contain; }
+.invitation-card-front .envelope-paper-fallback { text-align: center; }
+.invitation-card-front .envelope-paper-fallback > span:first-child { font-family: var(--font-couple-names); font-size: clamp(2rem, 8vw, 4rem); }
+.invitation-card-back { transform: rotateY(180deg); padding: 30px; font-family: var(--font-couple-names); font-size: clamp(2.5rem, 9vw, 5rem); text-align: center; color: var(--envelope-accent); }
+.invitation-card-back::before { content: ''; position: absolute; inset: 14px; border: 1px solid color-mix(in srgb, var(--envelope-accent) 25%, transparent); border-radius: 45% 45% 2px 2px; }
+.invitation-envelope.is-turning { background: transparent; transition: background .65s ease; }
+.is-turning .invitation-card-turner { animation: invitation-turn .9s cubic-bezier(.4,0,.2,1) forwards; }
+.is-turning .invitation-card-flight { animation: invitation-card-depart .35s .6s ease forwards; }
+@keyframes invitation-turn { to { transform: rotateY(180deg); } }
+@keyframes invitation-card-depart { to { opacity: 0; scale: 1.08; } }
+.invitation-copy-editor { margin: 22px 0; padding: 16px; border: 1px solid var(--theme-border); border-radius: 10px; }
+.invitation-copy-editor > summary { cursor: pointer; font-weight: 600; font-size: .9rem; }
+#invitationVisibilityFields { display: grid; gap: 8px; margin: 20px 0; }
+#invitationCopyFields textarea { resize: vertical; }
 @keyframes envelope-dismiss { to { opacity: 0; transform: translateY(15px); } }
 .invitation-music-toggle { position: fixed; z-index: 1001; right: 18px; bottom: max(18px, env(safe-area-inset-bottom)); padding: 12px 18px; border-radius: 30px; border: 1px solid var(--custom-accent-color, var(--theme-primary)); background: var(--theme-surface); color: var(--theme-text); box-shadow: 0 6px 25px #00000015; font-size: .8rem; cursor: pointer; }
 .music-status { position: fixed; z-index: 1002; left: 16px; right: 16px; bottom: 76px; text-align: center; font-size: .78rem; color: var(--theme-text); }

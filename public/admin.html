@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="/css/style.css?v=20261027-4">
   <script src="/js/qrcode.min.js?v=20260811-1"></script>
   <script src="/js/html2pdf.bundle.min.js?v=20260811-1"></script>
-  <link rel="stylesheet" href="/css/invitation-experience.css?v=20261027-6">
+  <link rel="stylesheet" href="/css/invitation-experience.css?v=20261028-1">
 </head>
 <body class="theme-warm_ivory">
   <div class="admin-container">
@@ -312,6 +312,14 @@
         </div>
 
 <h4 class="design-section-title">Katılım formu</h4>
+<details class="invitation-copy-editor">
+  <summary>Bölüm metinleri ve süslemeler</summary>
+  <p class="design-help">Davetiye ve zarf üzerindeki yazıları düzenleyin. Metni boş bırakırsanız gizlenir.</p>
+  <label class="form-label" for="editOrnament">Süsleme stili</label>
+  <select id="editOrnament" class="form-select"><option value="floral">Çiçekli ve kıvrımlı</option><option value="simple">Sade çizgiler</option><option value="none">Süslemesiz</option></select>
+  <div id="invitationVisibilityFields"></div>
+  <div id="invitationCopyFields"></div>
+</details>
 
 <div class="form-group"><label class="form-label" for="editEnableMeal"><input type="checkbox" id="editEnableMeal" checked> Yemek Tercihi Sorusunu Göster</label></div>
 
@@ -505,8 +513,9 @@
   <!-- Toast Notification -->
   <div class="toast" id="toast">İşlem başarılı!</div>
 
+  <script src="/js/invitation-settings.js?v=20261028-1"></script>
   <script src="/js/font-catalog.js?v=20261027-4"></script>
   <script src="/js/admin.js?v=20261027-6"></script>
-  <script src="/js/design-editor.js?v=20261027-6"></script>
+  <script src="/js/design-editor.js?v=20261028-1"></script>
 </body>
 </html>
