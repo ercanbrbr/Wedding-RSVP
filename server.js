@@ -171,6 +171,15 @@ function validateEventInput(body) {
     return 'Etkinlik bilgilerinden biri izin verilen uzunluğu aşıyor.';
   }
   if (Number.isNaN(Date.parse(body.event_date))) return 'Geçerli bir etkinlik tarihi girin.';
+  for (const [field, limit] of [['share_title', 150], ['share_description', 300], ['share_image_url', 2000]]) {
+    if (body[field] != null && (typeof body[field] !== 'string' || body[field].length > limit)) {
+      return `Paylaşım ${field === 'share_title' ? 'başlığı' : field === 'share_description' ? 'açıklaması' : 'görsel bağlantısı'} en fazla ${limit} karakter olmalıdır.`;
+    }
+  }
+  const shareImage = (body.share_image_url || '').trim();
+  if (shareImage && !isOptionalHttpUrl(shareImage) && !/^\/uploads\/[a-zA-Z0-9._-]+$/.test(shareImage)) {
+    return 'Geçerli bir paylaşım görseli bağlantısı girin.';
+  }
   if (body.invitation_subtitle != null && (typeof body.invitation_subtitle !== 'string'
     || body.invitation_subtitle.length > 150)) return 'İsimlerin altındaki yazı en fazla 150 karakter olmalıdır.';
   const invitationUrl = String(body.invitation_image_url || '').trim();
@@ -612,7 +621,8 @@ app.put('/api/admin/:adminToken', async (req, res) => {
       title, couple_names, event_date, location, map_url, description,
       invitation_image_url, theme_style, custom_font, custom_accent_color, custom_bg_color, custom_text_color,
       custom_meal_options, custom_base_url, welcome_message, dress_code, event_schedule, crest_style, crest_text, crest_font,
-      enable_meal_choice, enable_song_request, hall_width, hall_height, music_url, music_volume, invitation_subtitle
+      enable_meal_choice, enable_song_request, hall_width, hall_height, music_url, music_volume, invitation_subtitle,
+      share_title, share_description, share_image_url
     } = req.body;
 
     const event = await dbQuery.get('SELECT id FROM events WHERE admin_token = ?', [adminToken]);
@@ -637,7 +647,9 @@ app.put('/api/admin/:adminToken', async (req, res) => {
            custom_meal_options = ?, custom_base_url = ?, welcome_message = ?, dress_code = ?, event_schedule = ?,
            crest_style = ?, crest_text = ?, crest_font = ?, enable_meal_choice = ?, enable_song_request = ?,
            hall_width = ?, hall_height = ?, music_url = COALESCE(?, music_url), music_volume = COALESCE(?, music_volume),
-           invitation_subtitle = COALESCE(?, invitation_subtitle)
+           invitation_subtitle = COALESCE(?, invitation_subtitle),
+           share_title = COALESCE(?, share_title), share_description = COALESCE(?, share_description),
+           share_image_url = COALESCE(?, share_image_url)
        WHERE admin_token = ?`,
       [
         title.trim(),
@@ -667,6 +679,9 @@ app.put('/api/admin/:adminToken', async (req, res) => {
         music_url === undefined ? null : music_url,
         music_volume === undefined ? null : music_volume,
         invitation_subtitle == null ? null : invitation_subtitle.trim(),
+        share_title == null ? null : share_title.trim(),
+        share_description == null ? null : share_description.trim(),
+        share_image_url == null ? null : share_image_url.trim(),
         adminToken
       ]
     );
@@ -1078,6 +1093,7 @@ app.get('/api/public/:publicToken', async (req, res) => {
         title: event.title,
         couple_names: event.couple_names || event.title,
         invitation_subtitle: event.invitation_subtitle,
+        share_title: event.share_title || '',
         event_date: event.event_date,
         location: event.location,
         map_url: event.map_url,
@@ -1255,15 +1271,52 @@ app.get('/admin', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'admin.html'));
 });
 
-app.get('/e/:publicToken', (req, res) => {
-  const guestPath = path.join(__dirname, 'public', 'guest.html');
-  const rsvpPath = path.join(__dirname, 'public', 'rsvp.html');
-  if (fs.existsSync(guestPath)) {
-    res.sendFile(guestPath);
-  } else if (fs.existsSync(rsvpPath)) {
-    res.sendFile(rsvpPath);
-  } else {
-    res.status(404).send('Davetiye sayfası bulunamadı.');
+app.get('/e/:publicToken', async (req, res, next) => {
+  try {
+    const event = await dbQuery.get(
+      `SELECT title, couple_names, public_token, custom_base_url, invitation_image_url,
+              share_title, share_description, share_image_url FROM events WHERE public_token = ?`,
+      [req.params.publicToken]
+    );
+    if (!event) return res.status(404).send('Davetiye bulunamadı.');
+    const guestPath = path.join(__dirname, 'public', 'guest.html');
+    const templatePath = fs.existsSync(guestPath) ? guestPath : path.join(__dirname, 'public', 'rsvp.html');
+    const template = await fs.promises.readFile(templatePath, 'utf8');
+    const escapeMeta = value => String(value).replace(/[&<>"']/g, char => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[char]));
+    const title = event.share_title || `${event.couple_names || event.title} | Davetlisiniz`;
+    const description = event.share_description || 'Bu özel günümüzde sizi de aramızda görmek isteriz.';
+    const publicUrl = getPublicUrl(req, event);
+    const imageSource = event.share_image_url || event.invitation_image_url;
+    let imageUrl = '';
+    if (imageSource) {
+      try {
+        const parsed = new URL(imageSource, publicUrl);
+        if (['https:', 'http:'].includes(parsed.protocol)) imageUrl = parsed.href;
+      } catch { /* Older invalid URLs must not break the invitation. */ }
+    }
+    const metadata = [
+      `<title>${escapeMeta(title)}</title>`,
+      `<meta name="description" content="${escapeMeta(description)}">`,
+      '<meta property="og:type" content="website">',
+      '<meta property="og:locale" content="tr_TR">',
+      `<meta property="og:title" content="${escapeMeta(title)}">`,
+      `<meta property="og:description" content="${escapeMeta(description)}">`,
+      `<meta property="og:url" content="${escapeMeta(publicUrl)}">`,
+      `<meta name="twitter:card" content="${imageUrl ? 'summary_large_image' : 'summary'}">`,
+      `<meta name="twitter:title" content="${escapeMeta(title)}">`,
+      `<meta name="twitter:description" content="${escapeMeta(description)}">`
+    ];
+    if (imageUrl) metadata.push(
+      `<meta property="og:image" content="${escapeMeta(imageUrl)}">`,
+      `<meta property="og:image:alt" content="${escapeMeta(title)}">`,
+      `<meta name="twitter:image" content="${escapeMeta(imageUrl)}">`
+    );
+    res.setHeader('Cache-Control', 'no-store');
+    res.type('html').send(template.replace(/<title>[\s\S]*?<\/title>/i, () => metadata.join('\n  ')));
+  } catch (err) {
+    next(err);
   }
 });
 

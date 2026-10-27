@@ -558,7 +558,8 @@ if (customizeForm) {
       }
 
       const musicUrl = await window.designEditor.uploadMusic();
-      const payload = { ...currentEvent, ...draft, invitation_image_url: finalImageUrl, music_url: musicUrl };
+      const shareImageUrl = await window.designEditor.uploadShareImage();
+      const payload = { ...currentEvent, ...draft, invitation_image_url: finalImageUrl, music_url: musicUrl, share_image_url: shareImageUrl };
 
       const res = await fetch(`/api/admin/${currentEvent.admin_token}`, {
         method: 'PUT',

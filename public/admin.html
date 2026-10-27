@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="/css/style.css?v=20261027-4">
   <script src="/js/qrcode.min.js?v=20260811-1"></script>
   <script src="/js/html2pdf.bundle.min.js?v=20260811-1"></script>
-  <link rel="stylesheet" href="/css/invitation-experience.css?v=20261027-5">
+  <link rel="stylesheet" href="/css/invitation-experience.css?v=20261027-6">
 </head>
 <body class="theme-warm_ivory">
   <div class="admin-container">
@@ -322,6 +322,30 @@
 
 <div class="form-group"><label class="form-label" for="editEnableSong"><input type="checkbox" id="editEnableSong" checked> Şarkı İsteği Kutusu Göster</label></div>
 
+<h4 class="design-section-title">Paylaşım önizlemesi</h4>
+<p class="design-help">Linki paylaştığınızda görünen başlık, açıklama ve görsel. Boş alanlarda çift isimleri, davet mesajı ve davetiye görseli kullanılır.</p>
+<div class="form-group">
+  <label class="form-label" for="editShareTitle">Paylaşım başlığı</label>
+  <input type="text" id="editShareTitle" class="form-input" maxlength="150" placeholder="Çift isimleri | Davetlisiniz">
+</div>
+<div class="form-group">
+  <label class="form-label" for="editShareDescription">Paylaşım açıklaması</label>
+  <textarea id="editShareDescription" class="form-input" maxlength="300" rows="3" placeholder="Bu özel günümüzde sizi de aramızda görmek isteriz."></textarea>
+</div>
+<div class="form-group">
+  <label class="form-label" for="shareImageInput">Paylaşım görseli yükle</label>
+  <input type="file" id="shareImageInput" class="form-input" accept="image/jpeg,image/png,image/webp,image/gif">
+  <p class="design-help">JPG, PNG, WebP veya GIF; en fazla 10 MB.</p>
+  <label class="form-label" for="editShareImageUrl">Veya görsel bağlantısı</label>
+  <input type="text" id="editShareImageUrl" class="form-input" maxlength="2000" placeholder="https://…">
+  <button type="button" class="btn-secondary" id="resetShareImageButton">Davetiye görselini kullan</button>
+</div>
+<div class="share-preview-card" aria-label="Örnek paylaşım kartı">
+  <img id="sharePreviewImage" alt="Paylaşım görseli" hidden>
+  <div><strong id="sharePreviewTitle"></strong><p id="sharePreviewDescription"></p><small id="sharePreviewDomain"></small></div>
+</div>
+<p class="design-help">Bu kart yaklaşık görünümü gösterir. Paylaşım uygulamalarının görünümü değişebilir; eski önizleme bir süre önbellekte kalabilir.</p>
+
 <div class="design-save-actions" style="display: flex; gap: 12px; margin-top: 24px;">
           <button type="button" class="btn-secondary" onclick="closeCustomizeModal()" style="flex: 1; justify-content: center;">İptal</button>
           <button type="submit" class="btn-primary" style="flex: 1;" id="btnSaveCustomization">Tasarımı Kaydet</button>
@@ -482,7 +506,7 @@
   <div class="toast" id="toast">İşlem başarılı!</div>
 
   <script src="/js/font-catalog.js?v=20261027-4"></script>
-  <script src="/js/admin.js?v=20261027-4"></script>
-  <script src="/js/design-editor.js?v=20261027-4"></script>
+  <script src="/js/admin.js?v=20261027-6"></script>
+  <script src="/js/design-editor.js?v=20261027-6"></script>
 </body>
 </html>

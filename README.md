@@ -10,6 +10,12 @@ Yüklediğiniz davetiye görseli zarfın içinden çıkar. Görsel yoksa isimler
 
 Çift isimleri ve logo için 32 açık lisanslı, ücretsiz font hazırdır. Fontlar siteyle birlikte sunulur; font yükleme veya harici font servisi gerekmez. Kaynak ve lisans bilgileri [font açıklamasında](public/fonts/README.md) bulunur.
 
+## Paylaşım önizlemesi
+
+**Tasarım Düzenleyici → Paylaşım önizlemesi** bölümünde link kartının başlığını, açıklamasını ve görselini düzenleyebilirsiniz. Ayrı görsel yükleyebilir veya bağlantı girebilirsiniz. Boş alanlarda çift isimleri, varsayılan davet mesajı ve davetiye görseli kullanılır. **Tasarımı Kaydet** ile yayımlanır; iptal edilen görsel taslakları davetiyeyi değiştirmez.
+
+Davetiye bağlantısı `/e/:publicToken`, paylaşım bilgilerini [Open Graph](https://ogp.me/) meta etiketleriyle sunucu tarafında sunar. Mevcut veritabanına paylaşım sütunları uygulama başlatılırken eklenir. Paylaşım uygulamaları eski kartı önbellekte tutabildiğinden değişiklikler her uygulamada hemen görünmeyebilir.
+
 ## Doğrulama
 
 `node --test tests/design-experience.test.js` komutu geçici bir veritabanıyla müzik yüklemeyi, erişim denetimini, taslak/kayıt ayrımını, fontları ve mevcut veritabanına yeni sütunların eklenmesini sınar. Gerçek etkinlik verisini değiştirmez.

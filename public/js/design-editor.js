@@ -3,6 +3,8 @@
   const frame = document.getElementById('designPreviewFrame');
   const imageInput = document.getElementById('invitationFileInput');
   const musicInput = document.getElementById('musicFileInput');
+  const shareInput = document.getElementById('shareImageInput');
+  let shareObjectUrl = '';
   const audio = document.getElementById('musicPreview');
   const volume = document.getElementById('editMusicVolume');
   let imageObjectUrl = '';
@@ -30,7 +32,8 @@
     theme_style: 'editTheme', custom_font: 'editFontFamily', crest_font: 'editCrestFont',
     custom_accent_color: 'editAccentColor', custom_bg_color: 'editBgColor', custom_text_color: 'editTextColor',
     custom_meal_options: 'editMealOptions', crest_style: 'editCrestStyle', crest_text: 'editCrestText',
-    welcome_message: 'editWelcomeMessage', dress_code: 'editDressCode', invitation_subtitle: 'editInvitationSubtitle'
+    welcome_message: 'editWelcomeMessage', dress_code: 'editDressCode', invitation_subtitle: 'editInvitationSubtitle',
+    share_title: 'editShareTitle', share_description: 'editShareDescription', share_image_url: 'editShareImageUrl'
   };
 
   function getDraft() {
@@ -57,9 +60,50 @@
 
   function update() {
     if (!active) return;
+    updateSharePreview();
     cancelAnimationFrame(updateFrame);
     updateFrame = requestAnimationFrame(() => send());
   }
+
+  function updateSharePreview() {
+    const draft = getDraft();
+    document.getElementById('sharePreviewTitle').textContent = draft.share_title.trim()
+      || `${currentEvent.couple_names || currentEvent.title} | Davetlisiniz`;
+    document.getElementById('sharePreviewDescription').textContent = draft.share_description.trim()
+      || 'Bu özel günümüzde sizi de aramızda görmek isteriz.';
+    document.getElementById('sharePreviewDomain').textContent = new URL(currentEvent.public_url || location.href).hostname;
+    const img = document.getElementById('sharePreviewImage');
+    const source = shareObjectUrl || draft.share_image_url.trim() || draft.invitation_image_url;
+    if (source !== img.getAttribute('src')) {
+      img.hidden = !source;
+      if (source) img.src = source;
+      else img.removeAttribute('src');
+    }
+  }
+
+  function clearShareFile() {
+    if (shareObjectUrl) URL.revokeObjectURL(shareObjectUrl);
+    shareObjectUrl = '';
+    shareInput.value = '';
+  }
+
+  shareInput.addEventListener('change', () => {
+    if (shareObjectUrl) URL.revokeObjectURL(shareObjectUrl);
+    shareObjectUrl = '';
+    const file = shareInput.files[0];
+    if (file && (!['image/jpeg', 'image/png', 'image/webp', 'image/gif'].includes(file.type) || file.size > 10 * 1024 * 1024)) {
+      shareInput.value = '';
+      showToast('JPG, PNG, WebP veya GIF seçin. En fazla 10 MB.', 'error');
+    } else if (file) shareObjectUrl = URL.createObjectURL(file);
+    update();
+  });
+  document.getElementById('editShareImageUrl').addEventListener('input', () => { clearShareFile(); update(); });
+  document.getElementById('resetShareImageButton').addEventListener('click', () => {
+    clearShareFile();
+    document.getElementById('editShareImageUrl').value = '';
+    update();
+  });
+  document.getElementById('sharePreviewImage').addEventListener('error', (event) => { event.currentTarget.hidden = true; });
 
   function clearImage() {
     if (imageObjectUrl) URL.revokeObjectURL(imageObjectUrl);
@@ -143,6 +187,10 @@
     open() {
       previousFocus = document.activeElement;
       active = true;
+      clearShareFile();
+      for (const key of ['share_title', 'share_description', 'share_image_url']) {
+        document.getElementById(fields[key]).value = currentEvent[key] || '';
+      }
       form.scrollTop = 0;
       savedMusicUrl = currentEvent.music_url || '';
       musicInput.value = '';
@@ -161,9 +209,20 @@
       frame.src = 'about:blank';
       clearImage();
       clearMusic();
+      clearShareFile();
       document.body.classList.remove('design-editor-open');
       document.querySelector('.admin-container').inert = false;
       previousFocus?.focus();
+    },
+    async uploadShareImage() {
+      const file = shareInput.files[0];
+      if (!file) return document.getElementById('editShareImageUrl').value.trim();
+      const data = new FormData();
+      data.append('image', file);
+      const response = await fetch('/api/admin/session/upload?draft=1', { method: 'POST', body: data });
+      const result = await response.json();
+      if (!response.ok || !result.success) throw new Error(result.error || 'Paylaşım görseli yüklenemedi.');
+      return result.image_url;
     },
     async uploadMusic() {
       const file = musicInput.files[0];

@@ -100,7 +100,7 @@ function renderSeparatedNames(element, value, variant) {
 
 function renderEventDetails(event) {
   const coupleName = event.couple_names || event.title;
-  document.title = `${coupleName} | Düğün Davetiyesi & LCV`;
+  document.title = event.share_title || `${coupleName} | Davetlisiniz`;
 
   renderSeparatedNames(document.getElementById('eventCalligraphyTitle'), coupleName, 'couple');
 
