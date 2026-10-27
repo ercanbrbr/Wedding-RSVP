@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="/css/style.css?v=20260817-8">
   <script src="/js/qrcode.min.js?v=20260811-1"></script>
   <script src="/js/html2pdf.bundle.min.js?v=20260811-1"></script>
+  <link rel="stylesheet" href="/css/invitation-experience.css?v=20261027-2">
 </head>
 <body class="theme-warm_ivory">
   <div class="admin-container">
@@ -145,7 +146,7 @@
         </div>
         <div class="form-group">
           <label class="form-label">Çift İsimleri (Gelin & Damat)</label>
-          <input type="text" id="editCoupleNames" class="form-input" placeholder="Örn: Ahmet & Ayşe">
+          <input type="text" id="editCoupleNames" class="form-input" placeholder="Çift isimlerini yazın">
         </div>
         <div class="form-group">
           <label class="form-label">Tarih ve Saat</label>
@@ -177,12 +178,12 @@
 
   <!-- Customize Wedding Page & Visual Styling Modal -->
   <div class="modal-overlay" id="customizeModal">
-    <div class="modal-content">
+    <div class="modal-content design-workspace" role="dialog" aria-modal="true" aria-labelledby="designEditorTitle">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <h3 style="color: var(--theme-text); font-family: var(--font-ui); font-size: 1.4rem;">Tasarım & Renk Düzenleyici</h3>
-        <button class="btn-secondary" onclick="closeCustomizeModal()" style="padding: 4px 10px;">✕</button>
+        <div><h3 id="designEditorTitle">Davetiye Tasarım Atölyesi</h3><p class="design-help">Değiştirin, anında görün. Hazır olduğunuzda kaydedin.</p></div>
+        <button class="btn-secondary" onclick="closeCustomizeModal()" aria-label="Tasarım düzenleyicisini kapat" style="padding: 4px 10px;">✕</button>
       </div>
-
+      <div class="design-columns">
       <form id="customizeForm">
         <div class="form-group">
           <label class="form-label">Tema Şablonu (Renk Paleti)</label>
@@ -199,6 +200,9 @@
         <div class="form-group">
           <label class="form-label">Çift İsimleri Yazı Tipi (3. Kısım)</label>
           <select id="editFontFamily" class="form-select font-preview-select" onchange="applyFontSelectPreview(this)">
+            <option value="Sloop Script Pro" disabled>Sloop Script Pro — Font dosyası gerekli</option>
+            <option value="Pinyon Script">Pinyon Script — Sloop Benzeri Kaligrafi</option>
+            <option value="Libra Serif Modern">Libra Serif Modern — Modern Serif</option>
             <option value="Alex Brush">Alex Brush — El Yazısı</option>
             <option value="Corinthia">Corinthia — İnce ve Zarif</option>
             <option value="Italianno">Italianno — Akıcı Kaligrafi</option>
@@ -215,9 +219,18 @@
           </small>
         </div>
 
+        <div class="form-group">
+          <label class="form-label" for="editInvitationSubtitle">İsimlerin altındaki yazı (Düğün / Nişan vb.)</label>
+          <input type="text" id="editInvitationSubtitle" class="form-input" maxlength="150" placeholder="Örn: Düğün, Evleniyoruz, Sonsuza birlikte">
+          <p class="design-help">Çift isimlerinin hemen altında görünür. Boş bırakırsanız bu satır gizlenir.</p>
+        </div>
+
         <!-- Monogram Crest Style & Separate Font Options -->
         <div class="form-group" style="background: var(--theme-surface-muted); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--theme-border);">
           <label class="form-label" style="margin-bottom: 10px;">Monogram Amblem Ayarları (1. Kısım):</label>
+          <label class="form-label" for="editShowCrest" style="display: flex; gap: 8px; align-items: center; margin-bottom: 12px;">
+            <input type="checkbox" id="editShowCrest" checked> Baş harfler logosunu göster
+          </label>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
             <div>
               <label style="font-size: 0.75rem; display: block; margin-bottom: 4px;">Amblem Şekli</label>
@@ -236,6 +249,9 @@
           <div style="margin-top: 8px;">
             <label style="font-size: 0.75rem; display: block; margin-bottom: 4px;">Amblem Yazı Tipi (1. Kısım Fontu)</label>
             <select id="editCrestFont" class="form-select font-preview-select" style="padding: 8px;" onchange="applyFontSelectPreview(this)">
+              <option value="Sloop Script Pro" disabled>Sloop Script Pro — Font dosyası gerekli</option>
+              <option value="Pinyon Script">Pinyon Script — Sloop Benzeri Kaligrafi</option>
+              <option value="Libra Serif Modern">Libra Serif Modern — Modern Serif</option>
               <option value="Alex Brush">Alex Brush — El Yazısı</option>
               <option value="Corinthia">Corinthia — İnce ve Zarif</option>
               <option value="Italianno">Italianno — Akıcı Kaligrafi</option>
@@ -293,6 +309,18 @@
           </div>
         </div>
 
+        <fieldset class="music-editor">
+          <legend>Davetiye Müziği</legend>
+          <label class="form-label" for="musicFileInput">Bilgisayardan müzik yükle</label>
+          <input type="file" id="musicFileInput" class="form-input" accept=".mp3,.wav,.ogg,audio/mpeg,audio/wav,audio/ogg">
+          <p class="design-help">İndirdiğiniz MP3, WAV veya OGG dosyasını seçin. En fazla 20 MB. Zarf açıldığında çalar.</p>
+          <p id="musicFileName" class="design-help">Müzik seçilmedi.</p>
+          <label class="form-label" for="editMusicVolume">Ses düzeyi <output id="musicVolumeLabel" for="editMusicVolume">%15</output></label>
+          <input type="range" id="editMusicVolume" min="0" max="100" value="15">
+          <audio id="musicPreview" controls preload="none" hidden></audio>
+          <button type="button" class="btn-secondary" id="removeMusicButton">Müziği kaldır</button>
+        </fieldset>
+
         <div class="form-group">
           <label class="form-label">Davetiye Hoş Geldiniz Mesajı (5. Kısım)</label>
           <textarea id="editWelcomeMessage" class="form-textarea" placeholder="Bu mutlu günümüzde sizleri de aramızda görmekten onur duyarız..."></textarea>
@@ -320,11 +348,22 @@
           </button>
         </div>
 
-        <div style="display: flex; gap: 12px; margin-top: 24px;">
+        <div class="design-save-actions" style="display: flex; gap: 12px; margin-top: 24px;">
           <button type="button" class="btn-secondary" onclick="closeCustomizeModal()" style="flex: 1; justify-content: center;">İptal</button>
           <button type="submit" class="btn-primary" style="flex: 1;" id="btnSaveCustomization">Tasarımı Kaydet</button>
         </div>
       </form>
+      <aside class="design-preview" aria-label="Canlı davetiye önizlemesi">
+        <div class="design-preview-toolbar">
+          <div><strong>Canlı önizleme</strong><p class="design-help">Kaydetmeden yalnızca siz görürsünüz.</p></div>
+          <div class="preview-actions">
+            <button type="button" class="btn-secondary" id="previewMobileButton" aria-pressed="false">Telefon</button>
+            <button type="button" class="btn-secondary" id="previewEnvelopeButton">Zarfı dene</button>
+          </div>
+        </div>
+        <div class="design-preview-stage"><iframe id="designPreviewFrame" title="Davetiye canlı önizleme"></iframe></div>
+      </aside>
+      </div>
     </div>
   </div>
 
@@ -468,6 +507,7 @@
   <!-- Toast Notification -->
   <div class="toast" id="toast">İşlem başarılı!</div>
 
-  <script src="/js/admin.js?v=20260817-7"></script>
+  <script src="/js/admin.js?v=20261027-3"></script>
+  <script src="/js/design-editor.js?v=20261027-3"></script>
 </body>
 </html>

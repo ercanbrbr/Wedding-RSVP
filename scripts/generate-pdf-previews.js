@@ -1,5 +1,10 @@
 const fs = require('fs');
 const path = require('path');
+const publicToken = process.argv[2];
+if (!publicToken) {
+  console.error('Kullanım: node scripts/generate-pdf-previews.js <etkinlik-kodu>');
+  process.exit(1);
+}
 const { db, dbQuery } = require('../db');
 const {
   createFloorPlanPdf,
@@ -17,7 +22,6 @@ function writePdf(filePath, createPdf, data) {
 }
 
 async function main() {
-  const publicToken = process.argv[2] || 'fafcb04a-7de8-40a2-b5a0-e7f2b2198c38';
   const event = await dbQuery.get('SELECT * FROM events WHERE public_token = ?', [publicToken]);
   if (!event) throw new Error('Preview için etkinlik bulunamadı.');
 

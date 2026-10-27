@@ -1,6 +1,8 @@
 import json
 import os
 import sqlite3
+import argparse
+from pathlib import Path
 
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER
@@ -13,18 +15,25 @@ from reportlab.platypus import KeepTogether, Paragraph, SimpleDocTemplate, Space
 
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DB_PATH = os.path.join(ROOT, 'data', 'wedding_rsvp.db')
-OUTPUT_PATH = os.path.join(ROOT, 'output', 'pdf', 'masa_isim_listesi_Elif_Ercan.pdf')
-PUBLIC_TOKEN = 'fafcb04a-7de8-40a2-b5a0-e7f2b2198c38'
+parser = argparse.ArgumentParser(description='Seçilen etkinliğin masa isim listesini oluşturur.')
+parser.add_argument('event_code', help='Etkinliğin davetiye kodu')
+parser.add_argument('--output', default=os.path.join(ROOT, 'output', 'pdf', 'masa_isim_listesi.pdf'))
+args = parser.parse_args()
+DB_PATH = os.path.join(os.environ.get('DATA_DIR', os.path.join(ROOT, 'data')), 'wedding_rsvp.db')
+OUTPUT_PATH = os.path.abspath(args.output)
+PUBLIC_TOKEN = args.event_code
 
 pdfmetrics.registerFont(TTFont('WeddingSans', r'C:\Windows\Fonts\arial.ttf'))
 pdfmetrics.registerFont(TTFont('WeddingSansBold', r'C:\Windows\Fonts\arialbd.ttf'))
 
-connection = sqlite3.connect(DB_PATH)
+connection = sqlite3.connect(Path(DB_PATH).resolve().as_uri() + '?mode=ro', uri=True)
 connection.row_factory = sqlite3.Row
 event = connection.execute(
     'SELECT id, title, couple_names FROM events WHERE public_token = ?', (PUBLIC_TOKEN,)
 ).fetchone()
+if event is None:
+    connection.close()
+    parser.error('Etkinlik bulunamadı.')
 tables = connection.execute(
     'SELECT id, name, capacity FROM seating_tables WHERE event_id = ? ORDER BY created_at, rowid',
     (event['id'],),
@@ -163,7 +172,7 @@ def draw_footer(canvas, document):
     canvas.saveState()
     canvas.setFont('WeddingSans', 7.5)
     canvas.setFillColor(colors.HexColor('#777067'))
-    canvas.drawString(20 * mm, 10 * mm, 'Elif & Ercan - Masa İsim Listesi')
+    canvas.drawString(20 * mm, 10 * mm, f"{event['couple_names'] or event['title']} - Masa İsim Listesi")
     canvas.drawRightString(190 * mm, 10 * mm, f'Sayfa {document.page}')
     canvas.restoreState()
 
@@ -171,7 +180,7 @@ def draw_footer(canvas, document):
 os.makedirs(os.path.dirname(OUTPUT_PATH), exist_ok=True)
 document = SimpleDocTemplate(
     OUTPUT_PATH, pagesize=A4, rightMargin=20 * mm, leftMargin=20 * mm,
-    topMargin=18 * mm, bottomMargin=17 * mm, title='Elif & Ercan Masa İsim Listesi',
+    topMargin=18 * mm, bottomMargin=17 * mm, title=f"{event['couple_names'] or event['title']} Masa İsim Listesi",
 )
 document.build(story, onFirstPage=draw_footer, onLaterPages=draw_footer)
 print(OUTPUT_PATH)

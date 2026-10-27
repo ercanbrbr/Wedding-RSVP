@@ -34,7 +34,8 @@ if (process.env.TRUST_PROXY === '1') {
 app.disable('x-powered-by');
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'DENY');
+  const isPreview = req.path === '/admin/preview';
+  res.setHeader('X-Frame-Options', isPreview ? 'SAMEORIGIN' : 'DENY');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   res.setHeader('Content-Security-Policy', [
@@ -43,11 +44,12 @@ app.use((req, res, next) => {
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com data:",
     "img-src 'self' https: data: blob:",
+    "media-src 'self' blob:",
     "connect-src 'self'",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
-    "frame-ancestors 'none'"
+    isPreview ? "frame-ancestors 'self'" : "frame-ancestors 'none'"
   ].join('; '));
   if (isProduction && req.secure) {
     res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
@@ -167,6 +169,8 @@ function validateEventInput(body) {
     return 'Etkinlik bilgilerinden biri izin verilen uzunluğu aşıyor.';
   }
   if (Number.isNaN(Date.parse(body.event_date))) return 'Geçerli bir etkinlik tarihi girin.';
+  if (body.invitation_subtitle != null && (typeof body.invitation_subtitle !== 'string'
+    || body.invitation_subtitle.length > 150)) return 'İsimlerin altındaki yazı en fazla 150 karakter olmalıdır.';
   const invitationUrl = String(body.invitation_image_url || '').trim();
   const validInvitationUrl = !invitationUrl
     || isOptionalHttpUrl(invitationUrl)
@@ -175,7 +179,7 @@ function validateEventInput(body) {
     return 'Bağlantılar geçerli bir http:// veya https:// adresi olmalıdır.';
   }
   const allowedThemes = ['warm_ivory', 'botanical_sage', 'blush_rose', 'noir_gold', 'sage_linen', 'burgundy_cream'];
-  const allowedFonts = ['Alex Brush', 'Corinthia', 'Italianno', 'Parisienne', 'Great Vibes', 'Cormorant Garamond', 'Bodoni Moda', 'Playfair Display', 'Cinzel', 'Prata', 'Lora', 'Spectral', 'Libre Baskerville', 'DM Sans'];
+  const allowedFonts = ['Alex Brush', 'Corinthia', 'Italianno', 'Parisienne', 'Great Vibes', 'Cormorant Garamond', 'Bodoni Moda', 'Playfair Display', 'Cinzel', 'Prata', 'Lora', 'Spectral', 'Libre Baskerville', 'DM Sans', 'Sloop Script Pro', 'Libra Serif Modern', 'Pinyon Script'];
   if (body.theme_style && !allowedThemes.includes(body.theme_style)) return 'Geçersiz tema seçimi.';
   if (body.custom_font && !allowedFonts.includes(body.custom_font)) return 'Geçersiz yazı tipi seçimi.';
   if (body.crest_font && !allowedFonts.includes(body.crest_font)) return 'Geçersiz amblem yazı tipi seçimi.';
@@ -183,6 +187,10 @@ function validateEventInput(body) {
     if (!validHexColor(color)) return 'Geçersiz renk değeri.';
   }
   if (String(body.event_schedule || '').length > 10000) return 'Etkinlik programı çok uzun.';
+  if (body.music_volume !== undefined && (typeof body.music_volume !== 'number'
+    || !Number.isFinite(body.music_volume) || body.music_volume < 0 || body.music_volume > 1)) {
+    return 'Müzik ses düzeyi 0 ile 1 arasında olmalıdır.';
+  }
   return null;
 }
 
@@ -300,6 +308,33 @@ const upload = multer({
     }
   }
 });
+
+const audioTypes = { 'audio/mpeg': '.mp3', 'audio/wav': '.wav', 'audio/x-wav': '.wav', 'audio/ogg': '.ogg', 'application/ogg': '.ogg' };
+const musicUpload = multer({
+  storage: multer.diskStorage({
+    destination: uploadsDir,
+    filename: (req, file, cb) => cb(null, `music_${req.adminEvent.id}_${uuidv4()}${audioTypes[file.mimetype]}`)
+  }),
+  limits: { fileSize: 20 * 1024 * 1024, files: 1 },
+  fileFilter: (req, file, cb) => audioTypes[file.mimetype]
+    ? cb(null, true) : cb(new Error('Sadece MP3, WAV veya OGG müzik dosyaları yükleyebilirsiniz.'))
+});
+
+function detectAudioExtension(filePath) {
+  const buffer = Buffer.alloc(12);
+  const fd = fs.openSync(filePath, 'r');
+  try {
+    if (fs.readSync(fd, buffer, 0, 12, 0) < 12) return null;
+    if (buffer.toString('ascii', 0, 3) === 'ID3'
+      || (buffer[0] === 0xff && (buffer[1] & 0xe0) === 0xe0
+        && (buffer[1] & 0x06) !== 0 && (buffer[2] & 0xf0) !== 0xf0)) return '.mp3';
+    if (buffer.toString('ascii', 0, 4) === 'RIFF' && buffer.toString('ascii', 8, 12) === 'WAVE') return '.wav';
+    if (buffer.toString('ascii', 0, 4) === 'OggS') return '.ogg';
+    return null;
+  } finally {
+    fs.closeSync(fd);
+  }
+}
 
 async function requireAdmin(req, res, next) {
   try {
@@ -422,7 +457,7 @@ app.post('/api/events', createEventLimiter, async (req, res) => {
       title, couple_names, event_date, location, map_url, description,
       invitation_image_url, theme_style, custom_font, custom_accent_color, custom_bg_color, custom_text_color,
       custom_meal_options, custom_base_url, welcome_message, dress_code, event_schedule, crest_style, crest_text, crest_font,
-      enable_meal_choice, enable_song_request, hall_width, hall_height, admin_password
+      enable_meal_choice, enable_song_request, hall_width, hall_height, admin_password, invitation_subtitle
     } = req.body;
 
     const inputError = validateEventInput(req.body);
@@ -448,8 +483,8 @@ app.post('/api/events', createEventLimiter, async (req, res) => {
         invitation_image_url, theme_style, custom_font, custom_accent_color, custom_bg_color, custom_text_color,
         custom_meal_options, custom_base_url, welcome_message, dress_code, event_schedule, crest_style, crest_text, crest_font,
         enable_meal_choice, enable_song_request, hall_width, hall_height, admin_token, public_token,
-        admin_password_hash, admin_password_salt
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        admin_password_hash, admin_password_salt, invitation_subtitle
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         id,
         title.trim(),
@@ -479,7 +514,8 @@ app.post('/api/events', createEventLimiter, async (req, res) => {
         adminToken,
         publicToken,
         password.hash,
-        password.salt
+        password.salt,
+        invitation_subtitle == null ? null : invitation_subtitle.trim()
       ]
     );
 
@@ -575,7 +611,7 @@ app.put('/api/admin/:adminToken', async (req, res) => {
       title, couple_names, event_date, location, map_url, description,
       invitation_image_url, theme_style, custom_font, custom_accent_color, custom_bg_color, custom_text_color,
       custom_meal_options, custom_base_url, welcome_message, dress_code, event_schedule, crest_style, crest_text, crest_font,
-      enable_meal_choice, enable_song_request, hall_width, hall_height
+      enable_meal_choice, enable_song_request, hall_width, hall_height, music_url, music_volume, invitation_subtitle
     } = req.body;
 
     const event = await dbQuery.get('SELECT id FROM events WHERE admin_token = ?', [adminToken]);
@@ -585,13 +621,22 @@ app.put('/api/admin/:adminToken', async (req, res) => {
     const inputError = validateEventInput(req.body);
     if (inputError) return res.status(400).json({ error: inputError });
 
+    if (music_url !== undefined && music_url !== '') {
+      const musicPattern = new RegExp(`^/uploads/music_${event.id}_[a-f0-9-]+\\.(mp3|wav|ogg)$`);
+      if (typeof music_url !== 'string' || !musicPattern.test(music_url)
+        || !fs.existsSync(path.join(uploadsDir, path.basename(music_url)))) {
+        return res.status(400).json({ error: 'Bu etkinlik için yüklenmiş bir müzik dosyası seçin.' });
+      }
+    }
+
     await dbQuery.run(
       `UPDATE events
        SET title = ?, couple_names = ?, event_date = ?, location = ?, map_url = ?, description = ?,
            invitation_image_url = ?, theme_style = ?, custom_font = ?, custom_accent_color = ?, custom_bg_color = ?, custom_text_color = ?,
            custom_meal_options = ?, custom_base_url = ?, welcome_message = ?, dress_code = ?, event_schedule = ?,
            crest_style = ?, crest_text = ?, crest_font = ?, enable_meal_choice = ?, enable_song_request = ?,
-           hall_width = ?, hall_height = ?
+           hall_width = ?, hall_height = ?, music_url = COALESCE(?, music_url), music_volume = COALESCE(?, music_volume),
+           invitation_subtitle = COALESCE(?, invitation_subtitle)
        WHERE admin_token = ?`,
       [
         title.trim(),
@@ -618,6 +663,9 @@ app.put('/api/admin/:adminToken', async (req, res) => {
         enable_song_request ? 1 : 0,
         hall_width ? parseInt(hall_width) : 10,
         hall_height ? parseInt(hall_height) : 10,
+        music_url === undefined ? null : music_url,
+        music_volume === undefined ? null : music_volume,
+        invitation_subtitle == null ? null : invitation_subtitle.trim(),
         adminToken
       ]
     );
@@ -642,6 +690,16 @@ app.put('/api/admin/:adminToken', async (req, res) => {
 });
 
 // 4. Upload Invitation Cover Image
+app.post('/api/admin/:adminToken/music', uploadLimiter, requireAdmin, musicUpload.single('music'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'Lütfen bir müzik dosyası seçin.' });
+  if (detectAudioExtension(req.file.path) !== audioTypes[req.file.mimetype]) {
+    fs.unlinkSync(req.file.path);
+    return res.status(400).json({ error: 'Dosyanın içeriği desteklenen bir ses dosyası değil.' });
+  }
+  // Uploads are drafts; the invitation changes only after the event is saved.
+  res.json({ success: true, music_url: `/uploads/${req.file.filename}` });
+});
+
 app.post('/api/admin/:adminToken/upload', uploadLimiter, requireAdmin, upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
@@ -655,6 +713,7 @@ app.post('/api/admin/:adminToken/upload', uploadLimiter, requireAdmin, upload.si
 
     const previousEvent = await dbQuery.get('SELECT invitation_image_url FROM events WHERE id = ?', [req.adminEvent.id]);
     const imageUrl = `/uploads/${req.file.filename}`;
+    if (req.query.draft === '1') return res.json({ success: true, image_url: imageUrl });
     await dbQuery.run('UPDATE events SET invitation_image_url = ? WHERE id = ?', [imageUrl, req.adminEvent.id]);
 
     const previousUrl = previousEvent && previousEvent.invitation_image_url;
@@ -1017,11 +1076,14 @@ app.get('/api/public/:publicToken', async (req, res) => {
       event: {
         title: event.title,
         couple_names: event.couple_names || event.title,
+        invitation_subtitle: event.invitation_subtitle,
         event_date: event.event_date,
         location: event.location,
         map_url: event.map_url,
         description: event.description,
         invitation_image_url: event.invitation_image_url,
+        music_url: event.music_url || '',
+        music_volume: event.music_volume ?? 0.15,
         theme_style: event.theme_style || 'warm_ivory',
         custom_font: event.custom_font || 'Cormorant Garamond',
         custom_accent_color: event.custom_accent_color,
@@ -1179,6 +1241,11 @@ app.get(['/login', '/admin/setup'], (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
+app.get('/admin/preview', requireAuthenticatedSession, (req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+  res.sendFile(path.join(__dirname, 'public', 'guest.html'));
+});
+
 app.get('/admin/:adminToken', (req, res) => {
   res.redirect(302, `/admin/setup#token=${encodeURIComponent(req.params.adminToken)}`);
 });
@@ -1217,7 +1284,7 @@ app.get('*', (req, res) => {
 app.use((err, req, res, next) => {
   if (err instanceof multer.MulterError) {
     const message = err.code === 'LIMIT_FILE_SIZE'
-      ? 'Görsel en fazla 10 MB olabilir.'
+      ? (req.path.endsWith('/music') ? 'Müzik en fazla 20 MB olabilir.' : 'Görsel en fazla 10 MB olabilir.')
       : 'Dosya yüklenemedi.';
     return res.status(400).json({ error: message });
   }

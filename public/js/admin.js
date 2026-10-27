@@ -392,10 +392,11 @@ function addScheduleRow(time = '', icon = '', title = '') {
   row.innerHTML = `
     <input type="text" placeholder="19:00" value="${escapeHtml(time)}" class="form-input sched-time" style="width: 85px; padding: 8px;">
     <input type="text" placeholder="Program Adı" value="${escapeHtml(title)}" class="form-input sched-title" style="flex: 1; padding: 8px;">
-    <button type="button" class="btn-secondary" style="padding: 8px; color: #ef4444;" onclick="document.getElementById('${rowId}').remove()">✕</button>
+    <button type="button" class="btn-secondary" aria-label="Program maddesini kaldır" style="padding: 8px; color: #ef4444;" onclick="document.getElementById('${rowId}').remove(); window.designEditor?.update()">✕</button>
   `;
 
   container.appendChild(row);
+  window.designEditor?.update();
 }
 
 function getScheduleData() {
@@ -451,6 +452,7 @@ function clearInvitationImage() {
   if (fileInput) fileInput.value = '';
   const previewContainer = document.getElementById('imagePreviewContainer');
   if (previewContainer) previewContainer.style.display = 'none';
+  window.designEditor?.clearImage();
 }
 
 // Customize Modal
@@ -469,8 +471,12 @@ function openCustomizeModal() {
   document.getElementById('editBgColor').value = currentEvent.custom_bg_color || '#faf8f4';
   document.getElementById('editTextColor').value = currentEvent.custom_text_color || '#2b2925';
   document.getElementById('editMealOptions').value = currentEvent.custom_meal_options || 'Etli Menü, Vejetaryen / Vegan, Çocuk Menüsü';
-  document.getElementById('editCrestStyle').value = currentEvent.crest_style || 'circle';
+  document.getElementById('editShowCrest').checked = currentEvent.crest_style !== 'none';
+  document.getElementById('editCrestStyle').value = currentEvent.crest_style === 'none' ? 'circle' : (currentEvent.crest_style || 'circle');
   document.getElementById('editCrestText').value = currentEvent.crest_text || '';
+  const coupleName = currentEvent.couple_names || currentEvent.title;
+  document.getElementById('editInvitationSubtitle').value = currentEvent.invitation_subtitle
+    ?? (currentEvent.title && currentEvent.title !== coupleName ? currentEvent.title : 'Düğün');
   
   document.getElementById('editWelcomeMessage').value = currentEvent.welcome_message || '';
   document.getElementById('editDressCode').value = currentEvent.dress_code || '';
@@ -510,10 +516,13 @@ function openCustomizeModal() {
   }
 
   document.getElementById('customizeModal').classList.add('active');
+  window.designEditor?.open();
 }
 
 function closeCustomizeModal() {
+  if (document.getElementById('btnSaveCustomization')?.disabled) return;
   document.getElementById('customizeModal').classList.remove('active');
+  window.designEditor?.close();
 }
 
 const customizeForm = document.getElementById('customizeForm');
@@ -521,10 +530,13 @@ if (customizeForm) {
   customizeForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const btnSave = document.getElementById('btnSaveCustomization');
+    if (btnSave.disabled) return;
     btnSave.disabled = true;
     btnSave.textContent = 'Kaydediliyor...';
+    customizeForm.inert = true;
 
     try {
+      const draft = window.designEditor.getDraft();
       let finalImageUrl = document.getElementById('editInvitationUrl').value.trim();
       const fileInput = document.getElementById('invitationFileInput');
 
@@ -532,7 +544,7 @@ if (customizeForm) {
         const formData = new FormData();
         formData.append('image', fileInput.files[0]);
 
-        const uploadRes = await fetch(`/api/admin/${currentEvent.admin_token}/upload`, {
+        const uploadRes = await fetch(`/api/admin/${currentEvent.admin_token}/upload?draft=1`, {
           method: 'POST',
           body: formData
         });
@@ -545,32 +557,8 @@ if (customizeForm) {
         finalImageUrl = uploadData.image_url;
       }
 
-      const scheduleData = getScheduleData();
-
-      const payload = {
-        title: currentEvent.title,
-        couple_names: currentEvent.couple_names || currentEvent.title,
-        event_date: currentEvent.event_date,
-        location: currentEvent.location,
-        map_url: currentEvent.map_url || '',
-        custom_base_url: currentEvent.custom_base_url || '',
-        description: currentEvent.description,
-        invitation_image_url: finalImageUrl,
-        theme_style: document.getElementById('editTheme').value,
-        custom_font: document.getElementById('editFontFamily').value,
-        crest_font: document.getElementById('editCrestFont').value,
-        custom_accent_color: document.getElementById('editAccentColor').value,
-        custom_bg_color: document.getElementById('editBgColor').value,
-        custom_text_color: document.getElementById('editTextColor').value,
-        custom_meal_options: document.getElementById('editMealOptions').value,
-        crest_style: document.getElementById('editCrestStyle').value,
-        crest_text: document.getElementById('editCrestText').value,
-        welcome_message: document.getElementById('editWelcomeMessage').value,
-        dress_code: document.getElementById('editDressCode').value,
-        event_schedule: JSON.stringify(scheduleData),
-        enable_meal_choice: document.getElementById('editEnableMeal').checked ? 1 : 0,
-        enable_song_request: document.getElementById('editEnableSong').checked ? 1 : 0
-      };
+      const musicUrl = await window.designEditor.uploadMusic();
+      const payload = { ...currentEvent, ...draft, invitation_image_url: finalImageUrl, music_url: musicUrl };
 
       const res = await fetch(`/api/admin/${currentEvent.admin_token}`, {
         method: 'PUT',
@@ -581,12 +569,14 @@ if (customizeForm) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
 
+      btnSave.disabled = false;
       closeCustomizeModal();
       showToast('Tasarım ve tercihler kaydedildi.');
       loadAdminDashboard(currentEvent.admin_token);
     } catch (err) {
       showToast(err.message || 'Tasarım kaydedilemedi.', 'error');
     } finally {
+      customizeForm.inert = false;
       btnSave.disabled = false;
       btnSave.textContent = 'Tasarımı Kaydet';
     }
@@ -1812,22 +1802,4 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  const fileInputEl = document.getElementById('invitationFileInput');
-  if (fileInputEl) {
-    fileInputEl.addEventListener('change', (e) => {
-      const file = e.target.files && e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (evt) => {
-          const previewImg = document.getElementById('imagePreview');
-          const previewContainer = document.getElementById('imagePreviewContainer');
-          if (previewImg && previewContainer) {
-            previewImg.src = evt.target.result;
-            previewContainer.style.display = 'block';
-          }
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-  }
 });

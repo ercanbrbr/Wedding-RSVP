@@ -6,6 +6,7 @@ let selectedStatus = null;
 let selectedMeal = null;
 let hasPlusOnes = false;
 let countdownInterval = null;
+const isDesignPreview = window.location.pathname === '/admin/preview' && window.parent !== window;
 
 function showToast(message) {
   const toast = document.getElementById('toast');
@@ -31,12 +32,13 @@ async function initGuestView() {
     const data = await res.json();
 
     if (!res.ok || !data.success) {
-      alert(data.error || 'Etkinlik bulunamadı veya bağlantı sonlanmış.');
+      window.invitationExperience?.fail(data.error || 'Etkinlik bulunamadı veya bağlantı sonlanmış.');
       return;
     }
 
     currentPublicEvent = data.event;
     renderEventDetails(currentPublicEvent);
+    window.invitationExperience?.configure(currentPublicEvent, true);
 
     existingGuestToken = localStorage.getItem(`lcv_guest_token_${publicToken}`);
     if (existingGuestToken) {
@@ -44,7 +46,27 @@ async function initGuestView() {
     }
   } catch (err) {
     console.error('Error initializing guest view:', err);
+    if (!currentPublicEvent) window.invitationExperience?.fail('Davetiye yüklenemedi. Bağlantınızı kontrol edip sayfayı yenileyin.');
   }
+}
+
+if (isDesignPreview) {
+  window.addEventListener('message', (message) => {
+    if (message.origin !== location.origin || message.source !== window.parent) return;
+    if (message.data?.type === 'invitation-preview-pause') {
+      window.invitationExperience?.pause();
+      return;
+    }
+    if (!['invitation-preview', 'invitation-preview-envelope'].includes(message.data?.type) || !message.data.event) return;
+    currentPublicEvent = message.data.event;
+    renderEventDetails(currentPublicEvent);
+    document.body.classList.add('invitation-preview-mode');
+    window.invitationExperience?.configure(currentPublicEvent, message.data.type === 'invitation-preview-envelope');
+  });
+  document.addEventListener('click', (event) => {
+    if (event.target.closest('a')) event.preventDefault();
+  });
+  window.parent.postMessage({ type: 'invitation-preview-ready' }, location.origin);
 }
 
 function splitCoupleText(value) {
@@ -83,15 +105,15 @@ function renderEventDetails(event) {
   renderSeparatedNames(document.getElementById('eventCalligraphyTitle'), coupleName, 'couple');
 
   const subtitleEl = document.getElementById('eventSubtitle');
-  if (event.title && event.title !== coupleName) {
-    subtitleEl.textContent = event.title;
-  } else {
-    subtitleEl.textContent = 'Düğün';
-  }
+  const subtitle = event.invitation_subtitle
+    ?? (event.title && event.title !== coupleName ? event.title : 'Düğün');
+  subtitleEl.textContent = subtitle;
+  subtitleEl.hidden = !subtitle.trim();
 
   // Configurable Monogram Crest Text, Shape Style, and Separate Monogram Font (1. Kısım)
   const crestEl = document.getElementById('crestMonogram');
   if (crestEl) {
+    crestEl.hidden = event.crest_style === 'none';
     const textToShow = (event.crest_text && event.crest_text.trim()) 
       ? event.crest_text.trim() 
       : getInitials(coupleName);
@@ -113,7 +135,8 @@ function renderEventDetails(event) {
 
   // Theme Class (6 Semantic Themes)
   const themeClass = `theme-${event.theme_style || 'warm_ivory'}`;
-  document.body.className = `${themeClass} custom-theme-active`;
+  [...document.body.classList].filter(name => name.startsWith('theme-')).forEach(name => document.body.classList.remove(name));
+  document.body.classList.add(themeClass, 'custom-theme-active');
 
   if (event.custom_accent_color) {
     document.documentElement.style.setProperty('--custom-accent-color', event.custom_accent_color);
@@ -280,7 +303,7 @@ function getMealOptionsArray() {
 }
 
 function getInitials(nameStr) {
-  if (!nameStr) return 'E&E';
+  if (!nameStr) return '';
   const parts = nameStr.split(/&|ve|\+/i);
   if (parts.length >= 2) {
     const first = parts[0].trim().charAt(0).toUpperCase();
@@ -498,6 +521,10 @@ const rsvpForm = document.getElementById('rsvpForm');
 if (rsvpForm) {
   rsvpForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (isDesignPreview) {
+      showToast('Önizleme: Yanıt gönderilmez.');
+      return;
+    }
 
     const guestName = document.getElementById('guest_name').value.trim();
     if (!guestName) {
@@ -595,6 +622,7 @@ function reeditForm() {
 }
 
 function addToCalendar() {
+  if (isDesignPreview) return;
   if (!currentPublicEvent) return;
 
   const title = encodeURIComponent(currentPublicEvent.couple_names || currentPublicEvent.title);
