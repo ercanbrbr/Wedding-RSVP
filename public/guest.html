@@ -6,7 +6,7 @@
   <title>Düğün Davetiyesi & LCV Formu</title>
   <link rel="stylesheet" href="/css/style.css?v=20261027-4">
   <link rel="stylesheet" href="/css/invitation-experience.css?v=20261027-6">
-  <link rel="stylesheet" href="/css/invitation-page.css?v=20261027-8">
+  <link rel="stylesheet" href="/css/invitation-page.css?v=20261027-9">
 </head>
 <body class="theme-warm_ivory invitation-loading invitation-page">
   <div class="container invitation-document" hidden>
@@ -21,8 +21,14 @@
         <span class="image-overlay-hint">YAKINDAN BAKIN <span aria-hidden="true">↗</span></span>
       </button>
       <div class="invitation-hero-note">
+        <p class="invitation-eyebrow side-note-heading">BULUŞMA NOTLARI</p>
+      <div class="hero-event-info">
+        <div class="hero-info-row"><span class="invitation-detail-label">NE ZAMAN</span><strong id="eventDateStr"></strong><span id="eventTimeStr" class="hero-subtext"></span><button type="button" class="invitation-link" onclick="addToCalendar()">Takviminize ekleyin <span aria-hidden="true">↗</span></button></div>
+        <div class="hero-info-row"><span class="invitation-detail-label">NEREDE</span><strong id="eventLocation"></strong><a id="mapLink" target="_blank" rel="noopener noreferrer" class="map-btn invitation-link">Yol tarifi alın <span aria-hidden="true">↗</span></a></div>
+        <div class="hero-info-row" id="dressCodeContainer" style="display: none;"><span class="invitation-detail-label">GİYİM NOTU</span><strong id="dressCodeBadge"></strong></div>
+      </div>
+
         <div class="welcome-quote" id="welcomeMessageText" style="display: none;"></div>
-        <p class="hero-date-caption" id="heroDateCaption"></p>
         <button type="button" class="invitation-link hero-rsvp-link" onclick="openRsvp()">Bizimle kutlayın <span aria-hidden="true">↗</span></button>
       </div>
     </header>
@@ -37,14 +43,7 @@
       </div>
     </section>
 
-    <section class="invitation-gathering" aria-labelledby="gatheringTitle">
-      <div class="invitation-section-heading"><p class="invitation-eyebrow">BULUŞACAĞIMIZ AN</p><h2 id="gatheringTitle">Aynı yerde,<br><em>aynı mutlulukta.</em></h2></div>
-      <div class="hero-event-info">
-        <div class="hero-info-row"><span class="invitation-detail-label">NE ZAMAN</span><strong id="eventDateStr"></strong><span id="eventTimeStr" class="hero-subtext"></span><button type="button" class="invitation-link" onclick="addToCalendar()">Takviminize ekleyin <span aria-hidden="true">↗</span></button></div>
-        <div class="hero-info-row"><span class="invitation-detail-label">NEREDE</span><strong id="eventLocation"></strong><a id="mapLink" target="_blank" rel="noopener noreferrer" class="map-btn invitation-link">Yol tarifi alın <span aria-hidden="true">↗</span></a></div>
-        <div class="hero-info-row" id="dressCodeContainer" style="display: none;"><span class="invitation-detail-label">GİYİM NOTU</span><strong id="dressCodeBadge"></strong></div>
-      </div>
-    </section>
+
 
     <section class="timeline-section" id="timelineSection" style="display: none;" aria-labelledby="scheduleTitle"><p class="invitation-eyebrow">HER ANINI BİRLİKTE</p><h2 class="section-heading" id="scheduleTitle">Günün akışı</h2><div class="timeline-list" id="timelineContainer"></div></section>
     <section class="invitation-note" id="descriptionContainer" style="display: none;"><span class="invitation-note-mark" aria-hidden="true">“</span><div><p class="invitation-eyebrow">SİZE BİR NOTUMUZ VAR</p><p id="eventDescription"></p></div></section>
@@ -127,6 +126,6 @@
   <div class="modal-overlay" id="imageModal" onclick="closeImageModal()" role="dialog" aria-modal="true" aria-label="Davetiye görseli"><button type="button" class="image-close-button" onclick="closeImageModal()" aria-label="Görseli kapat">✕</button><img id="fullSizeImg" alt="Davetiye görseli, tam boyut"></div>
   <div class="toast" id="toast" role="status">Yanıtınız kaydedildi!</div>
   <script src="/js/invitation-experience.js?v=20261027-4"></script>
-  <script src="/js/guest.js?v=20261027-8"></script>
+  <script src="/js/guest.js?v=20261027-9"></script>
 </body>
 </html>
