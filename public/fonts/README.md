@@ -1,13 +1,13 @@
 # Davetiye fontları
 
-Pinyon Script, Sloop Script Pro'ya benzer eğimli ve süslü kaligrafi görünümü için eklenmiştir. Google Fonts deposundaki orijinal TTF dosyası değiştirilmeden, SIL Open Font License 1.1 lisansı ve FONTLOG dosyasıyla birlikte paketlenmiştir. Çift isimlerinde ve amblemde seçilebilir; harici font servisine bağlantı gerektirmez.
+Düzenleyicide 32 hazır font bulunur. Tüm aileler SIL Open Font License 1.1 altında ücretsiz kullanılabilir ve lisans dosyaları bu klasörde saklanır. Dosyalar kaynaklarından değiştirilmeden alınmıştır. Kullanıcının font yüklemesine veya harici font servisine bağlanmasına gerek yoktur.
 
-Kaynak: https://github.com/google/fonts/tree/main/ofl/pinyonscript
+Google Fonts kaynak sürümü: `ddf386ba1b9fbc6b2c818f1ddcd9148f54ced94b`.
 
-Libra Serif Modern Regular, Stefan Peev tarafından SIL Open Font License 1.1 ile yayımlanmıştır. Font değiştirilmeden paketlenmiştir; lisans `LibraSerifModern-OFL.txt` dosyasındadır.
+Her ailenin kaynak bağlantısı, font dosyaları ve lisans dosyası `catalog.json` içinde listelenir. Aynı katalog, tarayıcı ve sunucunun ortak kullandığı `../js/font-catalog.js` dosyasında bulunur. Stil tanımları `../css/fonts.css` dosyasındadır.
 
-Kaynak: https://www.1001fonts.com/libra-serif-modern-font.html
+Libra Serif Modern, Stefan Peev tarafından yayımlanmıştır. Kaynağı: https://www.1001fonts.com/libra-serif-modern-font.html
 
-Sloop Script Pro ticari bir fonttur. Kendi sunucunuzda kullanıma uygun lisanslı WOFF2 dosyanızı `public/fonts/SloopScriptPro.woff2` konumuna yerleştirin. Yönetim panelini yenilediğinizde çift isimleri ve amblem seçimlerinde etkinleşir. Bu dosya gelene kadar seçenek pasif kalır; farklı bir font Sloop adıyla gösterilmez.
+Diğer fontların kaynağı: https://github.com/google/fonts/tree/ddf386ba1b9fbc6b2c818f1ddcd9148f54ced94b/ofl
 
-Lisans bilgisi: https://fonts.adobe.com/fonts/sloop-script
+Yeni kaligrafi seçeneklerinin Türkçe harfleri doğrulanmıştır. Önceden bulunan Prata ailesinde bazı Türkçe harfler eksiktir; tarayıcı bu harflerde yedek font kullanır.

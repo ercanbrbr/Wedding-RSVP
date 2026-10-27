@@ -114,6 +114,7 @@ function renderEventDetails(event) {
   const crestEl = document.getElementById('crestMonogram');
   if (crestEl) {
     crestEl.hidden = event.crest_style === 'none';
+    crestEl.closest('.crest-header').hidden = crestEl.hidden;
     const textToShow = (event.crest_text && event.crest_text.trim()) 
       ? event.crest_text.trim() 
       : getInitials(coupleName);

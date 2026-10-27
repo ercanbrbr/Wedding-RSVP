@@ -7,6 +7,7 @@ const { spawn } = require('node:child_process');
 const { once } = require('node:events');
 const sqlite3 = require('sqlite3');
 const { randomUUID } = require('node:crypto');
+const invitationFonts = require('../public/js/font-catalog');
 
 let server, base, cookie, csrf, event, directory;
 const root = path.resolve(__dirname, '..');
@@ -152,13 +153,30 @@ test('draft image uploads also leave the published invitation untouched', async 
 });
 
 test('new font names save and the bundled Libra font is served', async () => {
-  assert.equal((await save({ custom_font: 'Libra Serif Modern', crest_font: 'Sloop Script Pro' })).status, 200);
+  assert.equal((await save({ custom_font: 'Libra Serif Modern', crest_font: 'MonteCarlo' })).status, 200);
   const result = await publicEvent();
   assert.equal(result.custom_font, 'Libra Serif Modern');
-  assert.equal(result.crest_font, 'Sloop Script Pro');
+  assert.equal(result.crest_font, 'MonteCarlo');
   const font = await fetch(`${base}/fonts/LibraSerifModern-Regular.otf`);
   assert.equal(font.status, 200);
   assert.equal(Buffer.from(await font.arrayBuffer()).toString('ascii', 0, 4), 'OTTO');
+});
+
+test('all 32 bundled open fonts are licensed, served and accepted for both font settings', async () => {
+  assert.equal(invitationFonts.length, 32);
+  assert.equal(new Set(invitationFonts.map(font => font.name)).size, 32);
+  assert.deepEqual(invitationFonts, JSON.parse(fs.readFileSync(path.join(root, 'public/fonts/catalog.json'), 'utf8')));
+  for (const font of invitationFonts) {
+    assert.match(fs.readFileSync(path.join(root, 'public/fonts', font.license), 'utf8'), /SIL OPEN FONT LICENSE/);
+    assert.equal((await save({ custom_font: font.name, crest_font: font.name })).status, 200, font.name);
+    for (const face of font.faces) {
+      const response = await fetch(`${base}/fonts/${encodeURIComponent(face.file)}`);
+      assert.equal(response.status, 200, face.file);
+      const bytes = Buffer.from(await response.arrayBuffer());
+      assert.ok(bytes.readUInt32BE(0) === 0x00010000 || bytes.toString('ascii', 0, 4) === 'OTTO', face.file);
+    }
+  }
+  assert.equal((await save({ custom_font: 'Unavailable Custom Font' })).status, 400);
 });
 
 test('invitation subtitle and hidden monogram persist independently of the event title', async () => {

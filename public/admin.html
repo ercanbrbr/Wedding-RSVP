@@ -4,10 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Yönetim Paneli | LCV Yönetimi</title>
-  <link rel="stylesheet" href="/css/style.css?v=20260817-8">
+  <link rel="stylesheet" href="/css/style.css?v=20261027-4">
   <script src="/js/qrcode.min.js?v=20260811-1"></script>
   <script src="/js/html2pdf.bundle.min.js?v=20260811-1"></script>
-  <link rel="stylesheet" href="/css/invitation-experience.css?v=20261027-2">
+  <link rel="stylesheet" href="/css/invitation-experience.css?v=20261027-4">
 </head>
 <body class="theme-warm_ivory">
   <div class="admin-container">
@@ -185,8 +185,10 @@
       </div>
       <div class="design-columns">
       <form id="customizeForm">
-        <div class="form-group">
-          <label class="form-label">Tema Şablonu (Renk Paleti)</label>
+<h4 class="design-section-title">Genel görünüm</h4>
+
+<div class="form-group">
+          <label class="form-label">Tema Şablonu</label>
           <select id="editTheme" class="form-select" onchange="onThemePresetChange(this.value)">
             <option value="warm_ivory">Şampanya & Fildişi — Klasik</option>
             <option value="botanical_sage">Zümrüt Yeşili & Botanik</option>
@@ -197,37 +199,62 @@
           </select>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Çift İsimleri Yazı Tipi (3. Kısım)</label>
-          <select id="editFontFamily" class="form-select font-preview-select" onchange="applyFontSelectPreview(this)">
-            <option value="Sloop Script Pro" disabled>Sloop Script Pro — Font dosyası gerekli</option>
-            <option value="Pinyon Script">Pinyon Script — Sloop Benzeri Kaligrafi</option>
-            <option value="Libra Serif Modern">Libra Serif Modern — Modern Serif</option>
-            <option value="Alex Brush">Alex Brush — El Yazısı</option>
-            <option value="Corinthia">Corinthia — İnce ve Zarif</option>
-            <option value="Italianno">Italianno — Akıcı Kaligrafi</option>
-            <option value="Parisienne">Parisienne — Paris Esintili</option>
-            <option value="Great Vibes">Great Vibes — Gösterişli Kaligrafi</option>
-            <option value="Cormorant Garamond">Cormorant Garamond — Zarif Klasik</option>
-            <option value="Bodoni Moda">Bodoni Moda — Moda Editoryali</option>
-            <option value="Playfair Display">Playfair Display — Romantik Serif</option>
-            <option value="Cinzel">Cinzel — Tören ve Monogram</option>
-            <option value="Prata">Prata — Lüks Davetiye</option>
-          </select>
-          <small style="color: var(--theme-muted); display: block; margin-top: 5px; font-size: 0.78rem;">
-            Bu seçim sadece 3. kısımdaki çift isimlerinin yazı tipini değiştirir.
-          </small>
+<div class="form-group">
+          <label class="form-label" style="margin-bottom: 10px;">Renk Ayarları</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+            <div>
+              <label style="font-size: 0.75rem; display: block; margin-bottom: 4px;">Vurgu Rengi</label>
+              <input type="color" id="editAccentColor" class="form-input" style="height: 38px; padding: 2px; cursor: pointer;" value="#b78c4a">
+            </div>
+            <div>
+              <label style="font-size: 0.75rem; display: block; margin-bottom: 4px;">Arkaplan</label>
+              <input type="color" id="editBgColor" class="form-input" style="height: 38px; padding: 2px; cursor: pointer;" value="#faf8f4">
+            </div>
+            <div>
+              <label style="font-size: 0.75rem; display: block; margin-bottom: 4px;">Metin Rengi</label>
+              <input type="color" id="editTextColor" class="form-input" style="height: 38px; padding: 2px; cursor: pointer;" value="#2b2925">
+            </div>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label" for="editInvitationSubtitle">İsimlerin altındaki yazı (Düğün / Nişan vb.)</label>
-          <input type="text" id="editInvitationSubtitle" class="form-input" maxlength="150" placeholder="Örn: Düğün, Evleniyoruz, Sonsuza birlikte">
-          <p class="design-help">Çift isimlerinin hemen altında görünür. Boş bırakırsanız bu satır gizlenir.</p>
+<h4 class="design-section-title">Zarf açılışı</h4>
+
+<div class="form-group">
+          <label class="form-label">Davetiye Görseli Yükle</label>
+          <input type="file" id="invitationFileInput" class="form-input" accept="image/*" style="padding: 8px;">
         </div>
 
-        <!-- Monogram Crest Style & Separate Font Options -->
-        <div class="form-group" style="background: var(--theme-surface-muted); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--theme-border);">
-          <label class="form-label" style="margin-bottom: 10px;">Monogram Amblem Ayarları (1. Kısım):</label>
+<div class="form-group">
+          <label class="form-label">veya Görsel Bağlantısı / Yüklü Görsel Yolu</label>
+          <input type="text" id="editInvitationUrl" class="form-input" placeholder="https://ornek.com/davetiye.jpg veya /uploads/gorsel.jpg">
+        </div>
+
+<div id="imagePreviewContainer" style="display: none; margin-bottom: 18px; text-align: center; background: var(--theme-surface-muted); padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--theme-border);">
+          <label style="font-size: 0.78rem; font-weight: 600; color: var(--theme-muted); display: block; margin-bottom: 6px;">Mevcut Davetiye Görseli Önizleme:</label>
+          <img id="imagePreview" src="" alt="Davetiye Görseli" style="max-width: 100%; max-height: 180px; border-radius: 4px; border: 1px solid var(--theme-border); object-fit: contain;">
+          <div style="margin-top: 8px;">
+            <button type="button" class="btn-secondary" onclick="clearInvitationImage()" style="padding: 4px 10px; font-size: 0.75rem; color: #ef4444; border-color: rgba(239,68,68,0.3);">
+              🗑️ Görseli Kaldır
+            </button>
+          </div>
+        </div>
+
+<fieldset class="music-editor">
+          <legend>Davetiye Müziği</legend>
+          <label class="form-label" for="musicFileInput">Bilgisayardan müzik yükle</label>
+          <input type="file" id="musicFileInput" class="form-input" accept=".mp3,.wav,.ogg,audio/mpeg,audio/wav,audio/ogg">
+          <p class="design-help">İndirdiğiniz MP3, WAV veya OGG dosyasını seçin. En fazla 20 MB. Zarf açıldığında çalar.</p>
+          <p id="musicFileName" class="design-help">Müzik seçilmedi.</p>
+          <label class="form-label" for="editMusicVolume">Ses düzeyi <output id="musicVolumeLabel" for="editMusicVolume">%15</output></label>
+          <input type="range" id="editMusicVolume" min="0" max="100" value="15">
+          <audio id="musicPreview" controls preload="none" hidden></audio>
+          <button type="button" class="btn-secondary" id="removeMusicButton">Müziği kaldır</button>
+        </fieldset>
+
+<h4 class="design-section-title">Davetiye</h4>
+
+<div class="form-group" style="background: var(--theme-surface-muted); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--theme-border);">
+          <label class="form-label" style="margin-bottom: 10px;">Baş Harfler Logosu</label>
           <label class="form-label" for="editShowCrest" style="display: flex; gap: 8px; align-items: center; margin-bottom: 12px;">
             <input type="checkbox" id="editShowCrest" checked> Baş harfler logosunu göster
           </label>
@@ -247,100 +274,36 @@
             </div>
           </div>
           <div style="margin-top: 8px;">
-            <label style="font-size: 0.75rem; display: block; margin-bottom: 4px;">Amblem Yazı Tipi (1. Kısım Fontu)</label>
-            <select id="editCrestFont" class="form-select font-preview-select" style="padding: 8px;" onchange="applyFontSelectPreview(this)">
-              <option value="Sloop Script Pro" disabled>Sloop Script Pro — Font dosyası gerekli</option>
-              <option value="Pinyon Script">Pinyon Script — Sloop Benzeri Kaligrafi</option>
-              <option value="Libra Serif Modern">Libra Serif Modern — Modern Serif</option>
-              <option value="Alex Brush">Alex Brush — El Yazısı</option>
-              <option value="Corinthia">Corinthia — İnce ve Zarif</option>
-              <option value="Italianno">Italianno — Akıcı Kaligrafi</option>
-              <option value="Parisienne">Parisienne — Paris Esintili</option>
-              <option value="Great Vibes">Great Vibes — Gösterişli Kaligrafi</option>
-              <option value="Cormorant Garamond">Cormorant Garamond — Zarif Klasik</option>
-              <option value="Bodoni Moda">Bodoni Moda — Moda Editoryali</option>
-              <option value="Playfair Display">Playfair Display — Romantik Serif</option>
-              <option value="Cinzel">Cinzel — Tören ve Monogram</option>
-              <option value="Prata">Prata — Lüks Davetiye</option>
-            </select>
+            <label style="font-size: 0.75rem; display: block; margin-bottom: 4px;">Amblem Yazı Tipi</label>
+            <select id="editCrestFont" class="form-select font-preview-select" style="padding: 8px;" onchange="applyFontSelectPreview(this)"></select>
           </div>
         </div>
 
-        <div class="form-group">
-          <label class="form-label" style="margin-bottom: 10px;">Renk Ayarları (Özel Renkler):</label>
-          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
-            <div>
-              <label style="font-size: 0.75rem; display: block; margin-bottom: 4px;">Vurgu Rengi</label>
-              <input type="color" id="editAccentColor" class="form-input" style="height: 38px; padding: 2px; cursor: pointer;" value="#b78c4a">
-            </div>
-            <div>
-              <label style="font-size: 0.75rem; display: block; margin-bottom: 4px;">Arkaplan</label>
-              <input type="color" id="editBgColor" class="form-input" style="height: 38px; padding: 2px; cursor: pointer;" value="#faf8f4">
-            </div>
-            <div>
-              <label style="font-size: 0.75rem; display: block; margin-bottom: 4px;">Metin Rengi</label>
-              <input type="color" id="editTextColor" class="form-input" style="height: 38px; padding: 2px; cursor: pointer;" value="#2b2925">
-            </div>
-          </div>
+<div class="form-group">
+          <label class="form-label">Çift İsimleri Yazı Tipi</label>
+          <select id="editFontFamily" class="form-select font-preview-select" onchange="applyFontSelectPreview(this)"></select>
+          <small style="color: var(--theme-muted); display: block; margin-top: 5px; font-size: 0.78rem;">
+            Çift isimlerinin yazı tipini seçin.
+          </small>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Yemek Seçenekleri (Virgülle Ayırın)</label>
-          <input type="text" id="editMealOptions" class="form-input" placeholder="Örn: Kırmızı Et Menüsü, Tavuk Menüsü, Vejetaryen, Çocuk Menüsü">
+<div class="form-group">
+          <label class="form-label" for="editInvitationSubtitle">İsimlerin altındaki yazı</label>
+          <input type="text" id="editInvitationSubtitle" class="form-input" maxlength="150" placeholder="Örn: Düğün, Evleniyoruz, Sonsuza birlikte">
+          <p class="design-help">Çift isimlerinin hemen altında görünür. Boş bırakırsanız bu satır gizlenir.</p>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Davetiye Görseli Yükle</label>
-          <input type="file" id="invitationFileInput" class="form-input" accept="image/*" style="padding: 8px;">
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">veya Görsel Bağlantısı / Yüklü Görsel Yolu</label>
-          <input type="text" id="editInvitationUrl" class="form-input" placeholder="https://ornek.com/davetiye.jpg veya /uploads/gorsel.jpg">
-        </div>
-
-        <div id="imagePreviewContainer" style="display: none; margin-bottom: 18px; text-align: center; background: var(--theme-surface-muted); padding: 12px; border-radius: var(--radius-md); border: 1px solid var(--theme-border);">
-          <label style="font-size: 0.78rem; font-weight: 600; color: var(--theme-muted); display: block; margin-bottom: 6px;">Mevcut Davetiye Görseli Önizleme:</label>
-          <img id="imagePreview" src="" alt="Davetiye Görseli" style="max-width: 100%; max-height: 180px; border-radius: 4px; border: 1px solid var(--theme-border); object-fit: contain;">
-          <div style="margin-top: 8px;">
-            <button type="button" class="btn-secondary" onclick="clearInvitationImage()" style="padding: 4px 10px; font-size: 0.75rem; color: #ef4444; border-color: rgba(239,68,68,0.3);">
-              🗑️ Görseli Kaldır
-            </button>
-          </div>
-        </div>
-
-        <fieldset class="music-editor">
-          <legend>Davetiye Müziği</legend>
-          <label class="form-label" for="musicFileInput">Bilgisayardan müzik yükle</label>
-          <input type="file" id="musicFileInput" class="form-input" accept=".mp3,.wav,.ogg,audio/mpeg,audio/wav,audio/ogg">
-          <p class="design-help">İndirdiğiniz MP3, WAV veya OGG dosyasını seçin. En fazla 20 MB. Zarf açıldığında çalar.</p>
-          <p id="musicFileName" class="design-help">Müzik seçilmedi.</p>
-          <label class="form-label" for="editMusicVolume">Ses düzeyi <output id="musicVolumeLabel" for="editMusicVolume">%15</output></label>
-          <input type="range" id="editMusicVolume" min="0" max="100" value="15">
-          <audio id="musicPreview" controls preload="none" hidden></audio>
-          <button type="button" class="btn-secondary" id="removeMusicButton">Müziği kaldır</button>
-        </fieldset>
-
-        <div class="form-group">
-          <label class="form-label">Davetiye Hoş Geldiniz Mesajı (5. Kısım)</label>
+<div class="form-group">
+          <label class="form-label">Hoş Geldiniz Mesajı</label>
           <textarea id="editWelcomeMessage" class="form-textarea" placeholder="Bu mutlu günümüzde sizleri de aramızda görmekten onur duyarız..."></textarea>
         </div>
 
-        <div class="form-group">
-          <label class="form-label">Giyim Kodu (Dress Code)</label>
+<div class="form-group">
+          <label class="form-label">Giyim Kodu</label>
           <input type="text" id="editDressCode" class="form-input" placeholder="Örn: Black Tie / Şık Giyim">
         </div>
 
-        <div class="form-group" style="padding: 12px 0;">
-          <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; cursor: pointer; margin-bottom: 8px;">
-            <input type="checkbox" id="editEnableMeal" checked> Yemek Tercihi Sorusunu Göster
-          </label>
-          <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; cursor: pointer;">
-            <input type="checkbox" id="editEnableSong" checked> Şarkı İsteği Kutusu Göster
-          </label>
-        </div>
-
-        <div class="form-group">
+<div class="form-group">
           <label class="form-label">Düğün Programı & Akışı</label>
           <div id="scheduleListContainer" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 8px;"></div>
           <button type="button" class="btn-secondary" onclick="addScheduleRow()" style="width: 100%; justify-content: center; font-size: 0.82rem;">
@@ -348,7 +311,18 @@
           </button>
         </div>
 
-        <div class="design-save-actions" style="display: flex; gap: 12px; margin-top: 24px;">
+<h4 class="design-section-title">Katılım formu</h4>
+
+<div class="form-group"><label class="form-label" for="editEnableMeal"><input type="checkbox" id="editEnableMeal" checked> Yemek Tercihi Sorusunu Göster</label></div>
+
+<div class="form-group">
+          <label class="form-label">Yemek Seçenekleri — Virgülle Ayırın</label>
+          <input type="text" id="editMealOptions" class="form-input" placeholder="Örn: Kırmızı Et Menüsü, Tavuk Menüsü, Vejetaryen, Çocuk Menüsü">
+        </div>
+
+<div class="form-group"><label class="form-label" for="editEnableSong"><input type="checkbox" id="editEnableSong" checked> Şarkı İsteği Kutusu Göster</label></div>
+
+<div class="design-save-actions" style="display: flex; gap: 12px; margin-top: 24px;">
           <button type="button" class="btn-secondary" onclick="closeCustomizeModal()" style="flex: 1; justify-content: center;">İptal</button>
           <button type="submit" class="btn-primary" style="flex: 1;" id="btnSaveCustomization">Tasarımı Kaydet</button>
         </div>
@@ -507,7 +481,8 @@
   <!-- Toast Notification -->
   <div class="toast" id="toast">İşlem başarılı!</div>
 
-  <script src="/js/admin.js?v=20261027-3"></script>
-  <script src="/js/design-editor.js?v=20261027-3"></script>
+  <script src="/js/font-catalog.js?v=20261027-4"></script>
+  <script src="/js/admin.js?v=20261027-4"></script>
+  <script src="/js/design-editor.js?v=20261027-4"></script>
 </body>
 </html>

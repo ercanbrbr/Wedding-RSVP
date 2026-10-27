@@ -9,7 +9,10 @@
     <div class="envelope-heading"><p class="envelope-eyebrow">BİRLİKTE, EN GÜZEL GÜNE</p>
       <h2 id="envelopeTitle"></h2><p>Sizin için bir davetiye var.</p></div>
     <button type="button" class="envelope-open" aria-label="Zarfı aç ve davetiyeyi görüntüle">
-      <span class="envelope-paper"><span id="envelopePaperNames"></span><span>Sevgiyle davetlisiniz</span></span>
+      <span class="envelope-paper">
+        <img id="envelopePaperImage" alt="Davetiye görseliniz" hidden>
+        <span class="envelope-paper-fallback"><span id="envelopePaperNames"></span><span class="envelope-paper-message">Sevgiyle davetlisiniz</span></span>
+      </span>
       <span class="envelope-pocket"></span><span class="envelope-flap"></span>
       <span class="envelope-seal" id="envelopeSeal"></span>
     </button>
@@ -33,9 +36,21 @@
   loading.textContent = 'Davetiyeniz hazırlanıyor…';
   document.body.append(loading);
   const openButton = envelope.querySelector('button');
+  const paper = envelope.querySelector('.envelope-paper');
+  const paperImage = document.getElementById('envelopePaperImage');
+  const paperFallback = envelope.querySelector('.envelope-paper-fallback');
+  let imageSource = '';
   let closingTimer = null;
   let source = '';
   let opening = false;
+
+  function showPaperImage(ready) {
+    paperImage.hidden = !ready;
+    paperFallback.hidden = ready;
+    paper.classList.toggle('has-image', ready);
+  }
+  paperImage.addEventListener('load', () => showPaperImage(paperImage.naturalWidth > 0));
+  paperImage.addEventListener('error', () => showPaperImage(false));
 
   function syncToggle() {
     toggle.textContent = audio.paused ? '♫ Müziği çal' : 'Ⅱ Müziği durdur';
@@ -67,7 +82,7 @@
     // Start playback directly from the tap, before awaiting any animation.
     play();
     envelope.classList.add('is-opening');
-    closingTimer = setTimeout(finishOpening, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 1400);
+    closingTimer = setTimeout(finishOpening, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 2000);
   });
   envelope.addEventListener('keydown', (event) => {
     if (event.key !== 'Tab') return;
@@ -114,6 +129,13 @@
       syncToggle();
       document.getElementById('envelopeTitle').textContent = event.couple_names || event.title;
       document.getElementById('envelopePaperNames').textContent = event.couple_names || event.title;
+      const nextImage = event.invitation_image_url || '';
+      if (nextImage !== imageSource) {
+        imageSource = nextImage;
+        showPaperImage(false);
+        if (imageSource) paperImage.src = imageSource;
+        else paperImage.removeAttribute('src');
+      }
       document.getElementById('envelopeSeal').textContent = event.crest_text || getInitials(event.couple_names || event.title);
       if (!showEnvelope) return;
       clearTimeout(closingTimer);

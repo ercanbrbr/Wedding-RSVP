@@ -4,6 +4,8 @@ const { randomUUID, randomBytes, createHash, scrypt: scryptCallback, timingSafeE
 const { promisify } = require('util');
 const multer = require('multer');
 const fs = require('fs');
+const invitationFonts = require('./public/js/font-catalog');
+const allowedFonts = new Set(invitationFonts.map(font => font.name));
 
 const envPath = path.join(__dirname, '.env');
 if (typeof process.loadEnvFile === 'function' && fs.existsSync(envPath)) {
@@ -179,10 +181,9 @@ function validateEventInput(body) {
     return 'Bağlantılar geçerli bir http:// veya https:// adresi olmalıdır.';
   }
   const allowedThemes = ['warm_ivory', 'botanical_sage', 'blush_rose', 'noir_gold', 'sage_linen', 'burgundy_cream'];
-  const allowedFonts = ['Alex Brush', 'Corinthia', 'Italianno', 'Parisienne', 'Great Vibes', 'Cormorant Garamond', 'Bodoni Moda', 'Playfair Display', 'Cinzel', 'Prata', 'Lora', 'Spectral', 'Libre Baskerville', 'DM Sans', 'Sloop Script Pro', 'Libra Serif Modern', 'Pinyon Script'];
   if (body.theme_style && !allowedThemes.includes(body.theme_style)) return 'Geçersiz tema seçimi.';
-  if (body.custom_font && !allowedFonts.includes(body.custom_font)) return 'Geçersiz yazı tipi seçimi.';
-  if (body.crest_font && !allowedFonts.includes(body.crest_font)) return 'Geçersiz amblem yazı tipi seçimi.';
+  if (body.custom_font && !allowedFonts.has(body.custom_font)) return 'Geçersiz yazı tipi seçimi.';
+  if (body.crest_font && !allowedFonts.has(body.crest_font)) return 'Geçersiz amblem yazı tipi seçimi.';
   for (const color of [body.custom_accent_color, body.custom_bg_color, body.custom_text_color].filter(Boolean)) {
     if (!validHexColor(color)) return 'Geçersiz renk değeri.';
   }

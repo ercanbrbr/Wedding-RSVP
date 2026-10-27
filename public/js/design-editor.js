@@ -12,6 +12,20 @@
   let updateFrame = 0;
   let previousFocus = null;
 
+  for (const id of ['editFontFamily', 'editCrestFont']) {
+    const select = document.getElementById(id);
+    for (const category of ['Kaligrafi', 'Serif', 'Sade']) {
+      const group = document.createElement('optgroup');
+      group.label = category;
+      for (const font of invitationFonts.filter(font => font.category === category)) {
+        const option = new Option(font.name, font.name);
+        option.style.fontFamily = `'${font.name}', serif`;
+        group.append(option);
+      }
+      select.append(group);
+    }
+  }
+
   const fields = {
     theme_style: 'editTheme', custom_font: 'editFontFamily', crest_font: 'editCrestFont',
     custom_accent_color: 'editAccentColor', custom_bg_color: 'editBgColor', custom_text_color: 'editTextColor',
@@ -163,15 +177,4 @@
     }
   };
 
-  // Enable the licensed font only when its actual webfont is installed.
-  fetch('/fonts/SloopScriptPro.woff2', { method: 'HEAD' }).then((response) => {
-    if (!response.ok || response.headers.get('content-type')?.includes('text/html')) return [];
-    return document.fonts.load('24px "Sloop Script Pro"');
-  }).then((faces) => {
-    if (!faces.length) return;
-    document.querySelectorAll('option[value="Sloop Script Pro"]').forEach((option) => {
-      option.disabled = false;
-      option.textContent = 'Sloop Script Pro — Kaligrafi';
-    });
-  }).catch(() => {});
 })();

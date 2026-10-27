@@ -6,7 +6,9 @@ Yönetim panelindeki **Tasarım Düzenleyici** ekranı, ayarları ve canlı dave
 
 **Davetiye Müziği** bölümüne bilgisayarınızdaki MP3, WAV veya OGG dosyasını yükleyebilirsiniz (en fazla 20 MB). Varsayılan ses düzeyi %15'tir. Müzik zarf açma dokunuşuyla başlar ve tekrar eder. Misafir müziği durdurup yeniden başlatabilir. Bazı mobil tarayıcılarda ses düzeyini cihazın ses ayarı belirler.
 
-Libra Serif Modern projeye lisansıyla birlikte eklenmiştir. Sloop Script Pro seçeneğinin etkinleşmesi için kendi sunucunuzda kullanıma uygun lisanslı font dosyası gerekir; kurulum ayrıntıları [font açıklamasında](public/fonts/README.md) bulunur.
+Yüklediğiniz davetiye görseli zarfın içinden çıkar. Görsel yoksa isimlerinizin bulunduğu kart gösterilir. Düzenleyici genel görünüm, zarf açılışı, logo, isimler, alt yazı, mesaj, giyim kodu, program ve katılım formu sırasını izler.
+
+Çift isimleri ve logo için 32 açık lisanslı, ücretsiz font hazırdır. Fontlar siteyle birlikte sunulur; font yükleme veya harici font servisi gerekmez. Kaynak ve lisans bilgileri [font açıklamasında](public/fonts/README.md) bulunur.
 
 ## Doğrulama
 
