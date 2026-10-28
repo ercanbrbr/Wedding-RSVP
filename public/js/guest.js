@@ -62,6 +62,7 @@ if (isDesignPreview) {
     renderEventDetails(currentPublicEvent);
     document.body.classList.add('invitation-preview-mode');
     window.invitationExperience?.configure(currentPublicEvent, message.data.type === 'invitation-preview-envelope');
+    window.previewTextEditor?.refresh(currentPublicEvent);
   });
   document.addEventListener('click', (event) => {
     if (event.target.closest('a')) event.preventDefault();

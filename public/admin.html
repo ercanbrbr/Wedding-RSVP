@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="/css/style.css?v=20261027-4">
   <script src="/js/qrcode.min.js?v=20260811-1"></script>
   <script src="/js/html2pdf.bundle.min.js?v=20260811-1"></script>
-  <link rel="stylesheet" href="/css/invitation-experience.css?v=20261028-1">
+  <link rel="stylesheet" href="/css/invitation-experience.css?v=20261028-2">
 </head>
 <body class="theme-warm_ivory">
   <div class="admin-container">
@@ -180,7 +180,7 @@
   <div class="modal-overlay" id="customizeModal">
     <div class="modal-content design-workspace" role="dialog" aria-modal="true" aria-labelledby="designEditorTitle">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-        <div><h3 id="designEditorTitle">Davetiye Tasarım Atölyesi</h3><p class="design-help">Değiştirin, anında görün. Hazır olduğunuzda kaydedin.</p></div>
+        <div><h3 id="designEditorTitle">Davetiye Tasarım Atölyesi</h3><p class="design-help">Soldan bölüm seçin veya önizlemedeki bir yazıya tıklayın.</p></div>
         <button class="btn-secondary" onclick="closeCustomizeModal()" aria-label="Tasarım düzenleyicisini kapat" style="padding: 4px 10px;">✕</button>
       </div>
       <div class="design-columns">
@@ -252,6 +252,7 @@
         </fieldset>
 
 <h4 class="design-section-title">Davetiye</h4>
+<div class="form-group"><label class="form-label" for="editDesignNames">Çift isimleri</label><input id="editDesignNames" class="form-input" maxlength="150" required></div>
 
 <div class="form-group" style="background: var(--theme-surface-muted); padding: 14px; border-radius: var(--radius-md); border: 1px solid var(--theme-border);">
           <label class="form-label" style="margin-bottom: 10px;">Baş Harfler Logosu</label>
@@ -311,6 +312,10 @@
           </button>
         </div>
 
+<h4 class="design-section-title">Tarih, mekân ve program</h4>
+<div class="form-group"><label class="form-label" for="editDesignDate">Tarih ve saat</label><input type="datetime-local" id="editDesignDate" class="form-input" required></div>
+<div class="form-group"><label class="form-label" for="editDesignLocation">Mekân</label><input id="editDesignLocation" class="form-input" maxlength="300" required></div>
+<div class="form-group"><label class="form-label" for="editDesignDescription">Davetliye notunuz</label><textarea id="editDesignDescription" class="form-textarea" maxlength="3000"></textarea></div>
 <h4 class="design-section-title">Katılım formu</h4>
 <details class="invitation-copy-editor">
   <summary>Bölüm metinleri ve süslemeler</summary>
@@ -361,7 +366,7 @@
       </form>
       <aside class="design-preview" aria-label="Canlı davetiye önizlemesi">
         <div class="design-preview-toolbar">
-          <div><strong>Canlı önizleme</strong><p class="design-help">Kaydetmeden yalnızca siz görürsünüz.</p></div>
+          <div><strong>Canlı önizleme</strong><p class="design-help">Yazıya tıklayın, düzenleyin. Kaydedene kadar yalnızca siz görürsünüz.</p></div>
           <div class="preview-actions">
             <button type="button" class="btn-secondary" id="previewMobileButton" aria-pressed="false">Telefon</button>
             <button type="button" class="btn-secondary" id="previewEnvelopeButton">Zarfı dene</button>
@@ -513,9 +518,9 @@
   <!-- Toast Notification -->
   <div class="toast" id="toast">İşlem başarılı!</div>
 
-  <script src="/js/invitation-settings.js?v=20261028-1"></script>
+  <script src="/js/invitation-settings.js?v=20261028-2"></script>
   <script src="/js/font-catalog.js?v=20261027-4"></script>
   <script src="/js/admin.js?v=20261027-6"></script>
-  <script src="/js/design-editor.js?v=20261028-1"></script>
+  <script src="/js/design-editor.js?v=20261028-2"></script>
 </body>
 </html>

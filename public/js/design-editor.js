@@ -52,7 +52,59 @@
     }
   }
 
+  // Keep existing controls and listeners, but organize them into short sections.
+  const sections = [];
+  let sectionBody;
+  for (const node of [...form.children]) {
+    if (node.matches('.design-section-title')) {
+      const section = document.createElement('details');
+      section.className = 'editor-section';
+      const summary = document.createElement('summary');
+      summary.textContent = node.textContent;
+      sectionBody = document.createElement('div');
+      sectionBody.className = 'editor-section-body';
+      section.append(summary, sectionBody);
+      node.replaceWith(section);
+      sections.push(section);
+    } else if (sectionBody && !node.matches('.design-save-actions')) sectionBody.append(node);
+  }
+  const bodies = sections.map(section => section.querySelector('.editor-section-body'));
+  const copyGroups = sections.map(section => {
+    const details = document.createElement('details');
+    details.className = 'editor-text-list';
+    const summary = document.createElement('summary');
+    summary.textContent = 'Bölüm yazılarını düzenle';
+    details.append(summary);
+    section.querySelector('.editor-section-body').append(details);
+    return details;
+  });
+  function copySection(key) {
+    if (key.startsWith('envelope_')) return 1;
+    if (['gathering_eyebrow', 'gathering_title', 'when', 'where', 'dress', 'schedule_eyebrow', 'schedule_title', 'note_eyebrow'].includes(key)) return 3;
+    if (key.startsWith('rsvp_')) return 4;
+    return 2;
+  }
+  for (const [key] of invitationSettings.text) copyGroups[copySection(key)].append(document.getElementById(`copy_${key}`).closest('.form-group'));
+  const ornament = document.getElementById('editOrnament');
+  bodies[0].append(ornament.previousElementSibling, ornament);
+  for (const [key] of invitationSettings.toggles) {
+    const index = key === 'show_arch' ? 0 : ['show_gathering', 'show_schedule'].includes(key) ? 3 : 2;
+    bodies[index].prepend(document.getElementById(`copy_${key}`).closest('label'));
+  }
+  bodies[3].append(document.getElementById('editDressCode').closest('.form-group'), document.getElementById('scheduleListContainer').closest('.form-group'));
+  document.querySelector('.invitation-copy-editor').remove();
+  copyGroups.forEach(group => { if (group.children.length === 1) group.remove(); });
+  sections[0].open = true;
+  for (const section of sections) section.addEventListener('toggle', event => {
+    if (event.target === section && section.open) sections.forEach(other => { if (other !== section) other.open = false; });
+  });
+  form.addEventListener('invalid', event => {
+    let parent = event.target.parentElement;
+    while (parent && parent !== form) { if (parent.tagName === 'DETAILS') parent.open = true; parent = parent.parentElement; }
+  }, true);
+
   const fields = {
+    couple_names: 'editDesignNames', location: 'editDesignLocation', description: 'editDesignDescription', event_date: 'editDesignDate',
     theme_style: 'editTheme', custom_font: 'editFontFamily', crest_font: 'editCrestFont',
     custom_accent_color: 'editAccentColor', custom_bg_color: 'editBgColor', custom_text_color: 'editTextColor',
     custom_meal_options: 'editMealOptions', crest_style: 'editCrestStyle', crest_text: 'editCrestText',
@@ -204,6 +256,23 @@
     event.currentTarget.setAttribute('aria-pressed', String(isMobile));
   });
   window.addEventListener('message', (event) => {
+    if (active && event.origin === location.origin && event.source === frame.contentWindow && event.data?.type === 'invitation-preview-edit') {
+      let entry = invitationEditFields.find(item => item[0] === event.data.key);
+      const scheduleKey = /^schedule:(\d+):(title|time)$/.exec(event.data.key || '');
+      let scheduleInput;
+      if (scheduleKey) {
+        const rows = [...document.querySelectorAll('#scheduleListContainer > div')].filter(row => row.querySelector('.sched-time')?.value.trim() || row.querySelector('.sched-title')?.value.trim());
+        scheduleInput = rows[Number(scheduleKey[1])]?.querySelector(`.sched-${scheduleKey[2]}`);
+        if (scheduleInput) entry = [event.data.key, '', '', '', 200];
+      }
+      if (!entry || typeof event.data.value !== 'string' || event.data.value.length > entry[4]) return;
+      const input = scheduleInput || document.getElementById(entry[3]);
+      input.value = event.data.value;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      let parent = input.parentElement;
+      while (parent && parent !== form) { if (parent.tagName === 'DETAILS') parent.open = true; parent = parent.parentElement; }
+      input.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
     if (event.origin === location.origin && event.source === frame.contentWindow && event.data?.type === 'invitation-preview-ready') send();
   });
   audio.addEventListener('play', () => frame.contentWindow?.postMessage({ type: 'invitation-preview-pause' }, location.origin));
@@ -216,6 +285,11 @@
     open() {
       previousFocus = document.activeElement;
       active = true;
+      document.getElementById('editDesignNames').value = currentEvent.couple_names || currentEvent.title || '';
+      document.getElementById('editDesignLocation').value = currentEvent.location || '';
+      document.getElementById('editDesignDescription').value = currentEvent.description || '';
+      const date = new Date(currentEvent.event_date);
+      document.getElementById('editDesignDate').value = new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
       const content = invitationContent(currentEvent);
       for (const [key, , fallback] of invitationSettings.text) document.getElementById(`copy_${key}`).value = content[key] ?? fallback;
       for (const [key] of invitationSettings.toggles) document.getElementById(`copy_${key}`).checked = content[key] !== false;
@@ -225,6 +299,7 @@
         document.getElementById(fields[key]).value = currentEvent[key] || '';
       }
       form.scrollTop = 0;
+      sections.forEach((section, index) => { section.open = index === 0; });
       savedMusicUrl = currentEvent.music_url || '';
       musicInput.value = '';
       volume.value = Math.round((currentEvent.music_volume ?? 0.15) * 100);

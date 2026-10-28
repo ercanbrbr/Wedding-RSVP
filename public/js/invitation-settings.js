@@ -31,6 +31,17 @@ const invitationSettings = {
   ]
 };
 const invitationDefaultMarkup = new WeakMap();
+const invitationEditFields = [
+  ['event_date', 'Tarih ve saat', '#eventDateStr, #eventTimeStr, #heroDateCaption', 'editDesignDate', 40],
+  ['couple_names', 'Çift isimleri', '#eventCalligraphyTitle, #invitationSignoff, #envelopeTitle, #envelopePaperNames', 'editDesignNames', 150],
+  ['invitation_subtitle', 'İsimlerin altındaki yazı', '#eventSubtitle', 'editInvitationSubtitle', 150],
+  ['crest_text', 'Amblem metni', '#crestMonogram, #envelopeSeal', 'editCrestText', 100],
+  ['welcome_message', 'Karşılama mesajı', '#welcomeMessageText', 'editWelcomeMessage', 3000],
+  ['location', 'Mekân', '#eventLocation', 'editDesignLocation', 300],
+  ['description', 'Size bir notumuz var', '#eventDescription', 'editDesignDescription', 3000],
+  ['dress_code', 'Giyim notu', '#dressCodeBadge', 'editDressCode', 300],
+  ...invitationSettings.text.map(([key, label, fallback, selector]) => [`copy:${key}`, label, selector, `copy_${key}`, 400])
+];
 function invitationContent(event) {
   try { return typeof event.invitation_content === 'string' ? JSON.parse(event.invitation_content) : (event.invitation_content || {}); }
   catch { return {}; }

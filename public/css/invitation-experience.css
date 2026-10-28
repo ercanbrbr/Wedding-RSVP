@@ -117,6 +117,39 @@
 .invitation-copy-editor > summary { cursor: pointer; font-weight: 600; font-size: .9rem; }
 #invitationVisibilityFields { display: grid; gap: 8px; margin: 20px 0; }
 #invitationCopyFields textarea { resize: vertical; }
+.editor-section { border: 1px solid var(--theme-border); border-radius: 12px; margin: 0 0 10px; background: var(--theme-surface); }
+.editor-section > summary { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 16px; cursor: pointer; list-style: none; font-size: .86rem; font-weight: 600; }
+.editor-section > summary::-webkit-details-marker { display: none; }
+.editor-section > summary::after { content: '+'; font-size: 1.2rem; color: var(--theme-muted); }
+.editor-section[open] > summary::after { content: '−'; }
+.editor-section[open] > summary { border-bottom: 1px solid var(--theme-border); color: var(--theme-primary); }
+.editor-section-body { padding: 18px 14px; }
+.editor-section-body > .form-group:last-child { margin-bottom: 0; }
+.editor-section-body > label { margin: 12px 0; }
+.editor-text-list { border-top: 1px solid var(--theme-border); margin-top: 18px; padding-top: 14px; }
+.editor-text-list > summary { cursor: pointer; color: var(--theme-muted); font-size: .8rem; margin-bottom: 14px; }
+.editor-text-list textarea { min-height: 64px; resize: vertical; }
+#customizeModal .design-columns { display: grid; grid-template-columns: minmax(220px, 350px) minmax(0, 1fr); }
+#customizeForm { scroll-padding-block: 16px 90px; }
+.preview-edit-mode [data-preview-edit] { cursor: text; outline: 1px dashed transparent; outline-offset: 5px; }
+.preview-edit-mode [data-preview-edit]:hover, .preview-edit-mode [data-preview-edit]:focus-visible { outline-color: var(--custom-accent-color, var(--theme-primary)); background-color: color-mix(in srgb, var(--theme-primary) 7%, transparent); }
+.preview-edit-toggle { position: fixed; left: 12px; bottom: 12px; z-index: 1100; padding: 10px 14px; border-radius: 24px; border: 1px solid #d4d8d0; background: #fffefa; color: #294233; font: 12px var(--font-ui); cursor: pointer; box-shadow: 0 3px 16px #00000015; }
+.preview-text-popover { position: fixed; z-index: 1200; bottom: 58px; left: 50%; transform: translateX(-50%); width: min(420px, calc(100% - 24px)); padding: 18px; border: 1px solid #d4d8d0; border-radius: 14px; background: #fffefa; color: #27342b; box-shadow: 0 16px 60px #00000030; font: 14px var(--font-ui); max-height: calc(100dvh - 80px); overflow: auto; }
+.preview-text-popover strong, .preview-text-popover label { display: block; margin-bottom: 12px; }
+.preview-text-popover label { font-size: 12px; color: #626b62; }
+.preview-text-popover textarea, .preview-text-popover input { width: 100%; padding: 12px; border: 1px solid #c9d0c4; border-radius: 6px; font: 16px var(--font-ui); color: #27342b; background: #fff; resize: vertical; }
+.preview-text-popover p { margin: 12px 0 16px; color: #626b62; font-size: 12px; line-height: 1.6; }
+.preview-text-popover > div { display: flex; gap: 10px; justify-content: flex-end; }
+.preview-text-popover button { padding: 10px 18px; border: 1px solid #c9d0c4; background: transparent; border-radius: 6px; cursor: pointer; color: #27342b; }
+.preview-text-popover button[data-action='apply'] { background: #365b49; color: #fff; border-color: #365b49; }
+@media (max-width: 640px) {
+  #customizeModal .design-columns { grid-template-columns: minmax(0, 42%) minmax(0, 1fr); gap: 8px; }
+  #customizeModal .design-preview { min-width: 0; }
+  #customizeModal .editor-section > summary { padding: 12px 8px; font-size: .76rem; }
+  #customizeModal .editor-section-body { padding: 12px 8px; }
+  #customizeModal .design-save-actions { flex-direction: column; }
+  #customizeModal .preview-actions { flex-wrap: wrap; }
+}
 @keyframes envelope-dismiss { to { opacity: 0; transform: translateY(15px); } }
 .invitation-music-toggle { position: fixed; z-index: 1001; right: 18px; bottom: max(18px, env(safe-area-inset-bottom)); padding: 12px 18px; border-radius: 30px; border: 1px solid var(--custom-accent-color, var(--theme-primary)); background: var(--theme-surface); color: var(--theme-text); box-shadow: 0 6px 25px #00000015; font-size: .8rem; cursor: pointer; }
 .music-status { position: fixed; z-index: 1002; left: 16px; right: 16px; bottom: 76px; text-align: center; font-size: .78rem; color: var(--theme-text); }
