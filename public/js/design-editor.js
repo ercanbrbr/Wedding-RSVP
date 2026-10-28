@@ -94,6 +94,13 @@
   bodies[3].append(document.getElementById('editDressCode').closest('.form-group'), document.getElementById('scheduleListContainer').closest('.form-group'));
   document.querySelector('.invitation-copy-editor').remove();
   copyGroups.forEach(group => { if (group.children.length === 1) group.remove(); });
+  const settingsScroll = document.createElement('div');
+  settingsScroll.className = 'editor-settings-scroll';
+  const saveActions = form.querySelector('.design-save-actions');
+  for (const node of [...form.children]) {
+    if (node !== saveActions) settingsScroll.append(node);
+  }
+  form.insertBefore(settingsScroll, saveActions);
   sections[0].open = true;
   for (const section of sections) section.addEventListener('toggle', event => {
     if (event.target === section && section.open) sections.forEach(other => { if (other !== section) other.open = false; });
@@ -298,7 +305,7 @@
       for (const key of ['share_title', 'share_description', 'share_image_url']) {
         document.getElementById(fields[key]).value = currentEvent[key] || '';
       }
-      form.scrollTop = 0;
+      settingsScroll.scrollTop = 0;
       sections.forEach((section, index) => { section.open = index === 0; });
       savedMusicUrl = currentEvent.music_url || '';
       musicInput.value = '';

@@ -23,8 +23,9 @@
 .share-preview-card p { margin: 6px 0; font-size: .8rem; white-space: pre-line; }
 .share-preview-card small { color: var(--theme-muted); }
 .design-columns { display: grid; grid-template-columns: minmax(310px, 410px) minmax(0, 1fr); gap: 24px; flex: 1; min-height: 0; }
-#customizeForm { overflow-y: auto; padding: 2px 14px 4px 2px; scrollbar-width: thin; }
-.design-save-actions { position: sticky; bottom: -4px; padding: 16px 0 4px; background: var(--theme-surface); z-index: 1; }
+#customizeForm { display: flex; flex-direction: column; min-width: 0; min-height: 0; overflow: hidden; padding: 0; }
+.editor-settings-scroll { flex: 1; min-height: 0; overflow-y: auto; padding: 2px 14px 12px 2px; scrollbar-width: thin; scroll-padding-block: 16px; }
+.design-save-actions { flex: 0 0 auto; position: static; padding: 14px 2px 4px; border-top: 1px solid var(--theme-border); background: var(--theme-surface); }
 .design-preview { display: flex; flex-direction: column; min-width: 0; min-height: 0; border: 1px solid var(--theme-border); border-radius: 14px; overflow: hidden; }
 .design-preview-toolbar { padding: 14px 18px; display: flex; justify-content: space-between; gap: 8px; align-items: center; background: var(--theme-surface); }
 .design-preview-toolbar strong { font-size: .85rem; }
@@ -130,7 +131,6 @@
 .editor-text-list > summary { cursor: pointer; color: var(--theme-muted); font-size: .8rem; margin-bottom: 14px; }
 .editor-text-list textarea { min-height: 64px; resize: vertical; }
 #customizeModal .design-columns { display: grid; grid-template-columns: minmax(220px, 350px) minmax(0, 1fr); }
-#customizeForm { scroll-padding-block: 16px 90px; }
 .preview-edit-mode [data-preview-edit] { cursor: text; outline: 1px dashed transparent; outline-offset: 5px; }
 .preview-edit-mode [data-preview-edit]:hover, .preview-edit-mode [data-preview-edit]:focus-visible { outline-color: var(--custom-accent-color, var(--theme-primary)); background-color: color-mix(in srgb, var(--theme-primary) 7%, transparent); }
 .preview-edit-toggle { position: fixed; left: 12px; bottom: 12px; z-index: 1100; padding: 10px 14px; border-radius: 24px; border: 1px solid #d4d8d0; background: #fffefa; color: #294233; font: 12px var(--font-ui); cursor: pointer; box-shadow: 0 3px 16px #00000015; }
